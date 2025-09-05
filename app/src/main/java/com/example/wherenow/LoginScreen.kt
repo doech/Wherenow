@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    Button(onClick = { navController.navigate("login") }) {
+    Button(onClick = { navController.navigate(NavRoutes.LOGIN) }) {
         Text("Sign in")
     }
 }

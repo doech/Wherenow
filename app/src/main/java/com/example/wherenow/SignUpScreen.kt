@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun SignUpScreen(navController: NavController) {
-    Button(onClick = { navController.navigate("signup") }) {
+    Button(onClick = { navController.navigate(NavRoutes.SIGNUP) }) {
         Text("Ir a SignUp")
     }
 }

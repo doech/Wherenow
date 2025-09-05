@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun LocationScreen(navController: NavController) {
-    Button(onClick = { navController.navigate("location") }) {
+    Button(onClick = { navController.navigate(NavRoutes.LOCATION) }) {
         Text("Allow location access")
     }
 }

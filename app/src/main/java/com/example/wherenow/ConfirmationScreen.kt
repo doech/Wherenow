@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun ConfirmationScreen(navController: NavController) {
-    Button(onClick = { navController.navigate("confirmation") }) {
+    Button(onClick = { navController.navigate(NavRoutes.CONFIRMATION) }) {
         Text("Start exploring")
     }
 }

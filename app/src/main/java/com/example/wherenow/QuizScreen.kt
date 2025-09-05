@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun QuizScreen(navController: NavController) {
-    Button(onClick = { navController.navigate("quiz") }) {
+    Button(onClick = { navController.navigate(NavRoutes.QUIZ) }) {
         Text("Continue")
     }
 }
