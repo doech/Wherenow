@@ -1,13 +1,155 @@
 package com.example.wherenow
 
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    Button(onClick = { navController.navigate(NavRoutes.LOGIN) }) {
-        Text("Sign in")
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var selectedTab by remember { mutableStateOf(0) } // 0 = Login, 1 = SignUp
+
+    // Fondo degradado
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFF9C8FFF), // purple
+                        Color(0xFFF871FF), // pink
+                        Color(0xFFFA8355)  // orange
+                    )
+                )
+            )
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Spacer(modifier = Modifier.height(60.dp))
+
+            Text(
+                text = "Where Now?",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Text(
+                text = "Find your next adventure!",
+                fontSize = 16.sp,
+                color = Color.White
+            )
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Card blanca para Login / SignUp
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Tabs
+                    TabRow(
+                        selectedTabIndex = selectedTab,
+                        containerColor = Color(0xFFF5F5F5), // gris clarito de fondo
+                        indicator = {},
+                        divider = {}
+                    ) {
+                        Tab(
+                            selected = selectedTab == 0,
+                            onClick = { selectedTab = 0 },
+                            text = { Text("Login") }
+                        )
+                        Tab(
+                            selected = selectedTab == 1,
+                            onClick = { selectedTab = 1 },
+                            text = { Text("Sign Up") }
+                        )
+                    }
+
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Text(
+                        text = "Welcome Back!",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Sign in to discover amazing events near you",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Input email
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                        placeholder = { Text("Enter your email") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Input password
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                        placeholder = { Text("Enter your password") },
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = PasswordVisualTransformation()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextButton(onClick = { /* recuperar contraseña */ }) {
+                        Text("Forgot password?", color = Color(0xFF6200EE))
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = {
+                            // Navegación después de login
+                            navController.navigate("home")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Sign In")
+                    }
+                }
+            }
+        }
     }
 }
+
