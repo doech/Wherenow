@@ -138,7 +138,7 @@ fun LoginScreen(navController: NavController) {
                     Button(
                         onClick = {
                             // Navegación después de login
-                            navController.navigate("home")
+                            navController.navigate(NavRoutes.CONFIRMATION)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
