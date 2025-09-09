@@ -14,11 +14,10 @@ fun NavComposable(
 ) {
     NavHost(
         navController = navController,
-        startDestination = NavRoutes.LOGIN,
+        startDestination = NavRoutes.AUTH,
         modifier = modifier
     ) {
-        composable(NavRoutes.LOGIN)        { LoginScreen(navController) }
-        composable(NavRoutes.SIGNUP)       { SignUpScreen(navController) }
+        composable(NavRoutes.AUTH)        { AuthScreen(navController) }
         composable(NavRoutes.LOCATION)     { LocationScreen(navController) }
         composable(NavRoutes.QUIZ)         { QuizScreen(navController) }
         composable(NavRoutes.CONFIRMATION) { ConfirmationScreen(navController) }

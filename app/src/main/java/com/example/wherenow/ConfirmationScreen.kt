@@ -127,7 +127,7 @@ fun ConfirmationScreen(navController: NavController) {
                         Text("← Back")
                     }
                     Button(
-                        onClick = { navController.navigate(NavRoutes.LOGIN) },
+                        onClick = { navController.navigate(NavRoutes.AUTH) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0))
                     ) {
                         Text("Start Exploring →")
