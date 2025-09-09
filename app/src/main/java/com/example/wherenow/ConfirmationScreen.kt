@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.ui.res.stringResource
 
 
 @Composable
@@ -53,11 +54,12 @@ fun ConfirmationScreen(navController: NavController) {
             ) {
 
                 Text(
-                    text = "Confirm your choices",
+                    text = stringResource(R.string.confirmation_title),
                     style = MaterialTheme.typography.headlineSmall
                 )
+
                 Text(
-                    text = "You've selected 3 categories",
+                    text = stringResource(R.string.confirmation_selected, interests.size),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -76,7 +78,7 @@ fun ConfirmationScreen(navController: NavController) {
 
 
                 Text(
-                    text = "Perfect! We'll recommend events based on these interests:",
+                    text = stringResource(R.string.confirmation_message),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -107,11 +109,14 @@ fun ConfirmationScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("What happens next?", style = MaterialTheme.typography.titleMedium)
-                        Spacer(Modifier.height(8.dp))
-                        Text("• We'll show you personalized event recommendations")
-                        Text("• You can always update your preferences later")
-                        Text("• Discover new events that match your interests")
+                    Text(
+                        stringResource(R.string.what_happens_next),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text("• " + stringResource(R.string.bullet_recommendations))
+                    Text("• " + stringResource(R.string.bullet_update))
+                    Text("• " + stringResource(R.string.bullet_discover))
                     }
                 }
 
@@ -124,13 +129,13 @@ fun ConfirmationScreen(navController: NavController) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(onClick = { navController.popBackStack() }) {
-                        Text("← Back")
+                        Text(stringResource(R.string.back))
                     }
                     Button(
-                        onClick = { navController.navigate(NavRoutes.QUIZ) },
+                        onClick = { navController.navigate(NavRoutes.AUTH) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0))
                     ) {
-                        Text("Start Exploring →")
+                        Text(stringResource(R.string.start_exploring))
                     }
                 }
             }

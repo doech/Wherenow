@@ -12,7 +12,7 @@ fun NavComposable(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    NavHost(
+    NavHost( //nav host
         navController = navController,
         startDestination = NavRoutes.AUTH,
         modifier = modifier

@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun AuthScreen(navController: NavController) {
@@ -49,13 +50,13 @@ fun AuthScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(60.dp))
 
             Text(
-                text = "Where Now?",
+                text = stringResource(R.string.app_name),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
             Text(
-                text = "Find your next adventure!",
+                text = stringResource(R.string.slogan),
                 fontSize = 16.sp,
                 color = Color.White
             )
@@ -84,12 +85,12 @@ fun AuthScreen(navController: NavController) {
                         Tab(
                             selected = selectedTab == 0,
                             onClick = { selectedTab = 0 },
-                            text = { Text("Login") }
+                            text = { Text(stringResource(R.string.login_title)) }
                         )
                         Tab(
                             selected = selectedTab == 1,
                             onClick = { selectedTab = 1 },
-                            text = { Text("Sign Up") }
+                            text = { Text(stringResource(R.string.signup_title)) }
                         )
                     }
 
@@ -98,12 +99,12 @@ fun AuthScreen(navController: NavController) {
                     if (selectedTab == 0) {
                         // Login Form
                         Text(
-                            text = "Welcome Back!",
+                            text = stringResource(R.string.welcome_back),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Sign in to discover amazing events near you",
+                            text = stringResource(R.string.signin_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
                         )
@@ -115,7 +116,7 @@ fun AuthScreen(navController: NavController) {
                             value = email,
                             onValueChange = { email = it },
                             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-                            placeholder = { Text("Enter your email") },
+                            placeholder = { Text(stringResource(R.string.enter_email)) },
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -126,7 +127,7 @@ fun AuthScreen(navController: NavController) {
                             value = password,
                             onValueChange = { password = it },
                             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-                            placeholder = { Text("Enter your password") },
+                            placeholder = { Text(stringResource(R.string.enter_password)) },
                             modifier = Modifier.fillMaxWidth(),
                             visualTransformation = PasswordVisualTransformation()
                         )
@@ -134,7 +135,7 @@ fun AuthScreen(navController: NavController) {
                         Spacer(modifier = Modifier.height(10.dp))
 
                         TextButton(onClick = { /* recuperar contraseña */ }) {
-                            Text("Forgot password?", color = Color(0xFF6200EE))
+                            Text(stringResource(R.string.forgot_password), color = Color(0xFF6200EE))
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -142,24 +143,24 @@ fun AuthScreen(navController: NavController) {
                         Button(
                             onClick = {
                                 // Navegación después de login
-                                navController.navigate(NavRoutes.CONFIRMATION)
+                                navController.navigate(NavRoutes.LOCATION)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Sign In")
+                            Text(stringResource(R.string.signup_title), color = Color.White)
                         }
                     } else {
                         // Sign Up Form
                         Text(
-                            text = "Join the adventure",
+                            text = stringResource(R.string.join_adventure),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Create your account and start discovering events",
+                            text = stringResource(R.string.signup_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
                         )
@@ -171,7 +172,7 @@ fun AuthScreen(navController: NavController) {
                             value = fullName,
                             onValueChange = { fullName = it },
                             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                            placeholder = { Text("Enter your full name") },
+                            placeholder = { Text(stringResource(R.string.enter_fullname)) },
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -182,7 +183,7 @@ fun AuthScreen(navController: NavController) {
                             value = email,
                             onValueChange = { email = it },
                             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-                            placeholder = { Text("Enter your email") },
+                            placeholder = { Text(stringResource(R.string.enter_email))},
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -193,7 +194,7 @@ fun AuthScreen(navController: NavController) {
                             value = password,
                             onValueChange = { password = it },
                             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-                            placeholder = { Text("Create a password") },
+                            placeholder = { Text(stringResource(R.string.create_password)) },
                             modifier = Modifier.fillMaxWidth(),
                             visualTransformation = PasswordVisualTransformation()
                         )
@@ -205,7 +206,7 @@ fun AuthScreen(navController: NavController) {
                             value = confirmPassword,
                             onValueChange = { confirmPassword = it },
                             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-                            placeholder = { Text("Confirm your password") },
+                            placeholder = { Text(stringResource(R.string.confirm_your_password)) },
                             modifier = Modifier.fillMaxWidth(),
                             visualTransformation = PasswordVisualTransformation()
                         )
@@ -215,7 +216,7 @@ fun AuthScreen(navController: NavController) {
                         Button(
                             onClick = {
                                 // Navegación después de signup
-                                navController.navigate(NavRoutes.CONFIRMATION)
+                                navController.navigate(NavRoutes.LOCATION)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -223,7 +224,7 @@ fun AuthScreen(navController: NavController) {
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C8FFF))
                         ) {
-                            Text("Create Account")
+                            Text(stringResource(R.string.create_account), color = Color.White)
                         }
                     }
                 }
