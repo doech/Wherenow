@@ -3,6 +3,8 @@ package com.example.wherenow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -11,19 +13,25 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+
 
 @Composable
 fun ConfirmationScreen(navController: NavController) {
-    // Lista provisional de intereses
-    val interests = listOf("Interest 1", "Interest 2", "Interest 3")
+    val interests = listOf(
+        "Health & Wellness",
+        "Photography",
+        "Social & Networking"
+    )
 
-    // Fondo degradado
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(
+                    colors = listOf(
                         Color(0xFFB388FF),
                         Color(0xFFFF80AB)
                     )
@@ -31,39 +39,68 @@ fun ConfirmationScreen(navController: NavController) {
             ),
         contentAlignment = Alignment.Center
     ) {
-        // Tarjeta blanca en el centro
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp),
             shape = RoundedCornerShape(24.dp),
             elevation = CardDefaults.cardElevation(6.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White) // 👈 blanco
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
+                modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 Text(
                     text = "Confirm your choices",
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
-                    text = "You've selected ${interests.size} categories",
+                    text = "You've selected 3 categories",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
 
-                interests.forEach { label ->
-                    InterestChip(label)
-                    Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(16.dp))
+
+
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Heart",
+                    tint = Color(0xFF9C27B0),
+                    modifier = Modifier.size(48.dp)
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+
+                Text(
+                    text = "Perfect! We'll recommend events based on these interests:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 140.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    userScrollEnabled = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 0.dp, max = 200.dp)
+                ) {
+                    items(interests) { label ->
+                        InterestChip(label)
+                    }
                 }
 
                 Spacer(Modifier.height(24.dp))
 
-                // Caja gris "What happens next?" (placeholder)
+
                 Card(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
                     shape = RoundedCornerShape(16.dp),
@@ -72,20 +109,29 @@ fun ConfirmationScreen(navController: NavController) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("What happens next?", style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(8.dp))
-                        Text("• Placeholder text 1")
-                        Text("• Placeholder text 2")
-                        Text("• Placeholder text 3")
+                        Text("• We'll show you personalized event recommendations")
+                        Text("• You can always update your preferences later")
+                        Text("• Discover new events that match your interests")
                     }
                 }
 
                 Spacer(Modifier.height(24.dp))
 
-                // Botones (uno de ejemplo)
-                Button(
-                    onClick = { navController.navigate(NavRoutes.LOGIN) },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Start Exploring →")
+                    TextButton(onClick = { navController.popBackStack() }) {
+                        Text("← Back")
+                    }
+                    Button(
+                        onClick = { navController.navigate(NavRoutes.LOGIN) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0))
+                    ) {
+                        Text("Start Exploring →")
+                    }
                 }
             }
         }
