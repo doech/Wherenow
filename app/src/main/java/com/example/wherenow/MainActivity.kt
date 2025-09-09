@@ -17,10 +17,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WherenowTheme {
+                //nav controller
                 val navController = rememberNavController()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NavComposable(
+                    NavComposable( //navhost indirecto
                         navController = navController,
                         modifier = Modifier.padding(innerPadding)
                     )

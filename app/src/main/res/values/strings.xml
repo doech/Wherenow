@@ -1,3 +1,71 @@
 <resources>
-    <string name="app_name">Wherenow</string>
+    <!-- General -->
+    <string name="app_name">WhereNow</string>
+    <string name="back">Back</string>
+    <string name="continue_">Continue</string>
+    <string name="start_exploring">Start Exploring</string>
+    <string name="slogan">Find your next adventure!</string>
+
+    <!-- Login / Signup -->
+    <string name="login_title">Login</string>
+    <string name="signup_title">Sign Up</string>
+    <string name="signin_button">Sign in</string>
+    <string name="create_account_button">Create account</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="confirm_password_label">Confirm password</string>
+    <string name="no_account">Don t have an account? Sign up</string>
+    <string name="already_have_account">Already have an account? Sign in</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="signin_subtitle">Sign in to discover amazing events near you</string>
+    <string name="enter_email">Enter your email</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="join_adventure">Join the adventure</string>
+    <string name="signup_subtitle">Create your account and start discovering events</string>
+    <string name="enter_fullname">Enter your full name</string>
+    <string name="create_password">Create a password</string>
+    <string name="confirm_your_password">Confirm your password</string>
+    <string name="create_account">Create Account</string>
+
+    <!-- Quiz -->
+    <string name="quiz_title">Choose your interests</string>
+    <string name="quiz_subtitle">Pick at least 3 categories that excite you most</string>
+
+    <!-- Confirmation -->
+    <string name="confirmation_title">Confirm your choices</string>
+    <string name="confirmation_selected">You ve selected %1$d categories</string>
+    <string name="confirmation_message">Perfect! We ll recommend events based on these interests:</string>
+    <string name="what_happens_next">What happens next?</string>
+    <string name="bullet_recommendations">We ll show you personalized event recommendations</string>
+    <string name="bullet_update">You can always update your preferences later</string>
+    <string name="bullet_discover">Discover new events that match your interests</string>
+
+    <!-- Location -->
+    <string name="location_title">Location Access</string>
+    <string name="location_message">We need your location to show you the best events happening nearby and help you discover new experiences in your area.</string>
+    <string name="allow_location_button">Allow location access</string>
+    <string name="personalized_recommendations">Personalized Recommendations</string>
+    <string name="personalized_recommendations_desc">Get events tailored to your location and interests</string>
+    <string name="nearby_events">Nearby Events</string>
+    <string name="nearby_events_desc">Never miss out on exciting events happening close to you</string>
+    <string name="connect_with_others">Connect with Others</string>
+    <string name="connect_with_others_desc">Find people with similar interests in your area</string>
+    <string name="privacy_matters">Your privacy matters. We only use your location to show relevant events and never share it with third parties.</string>
+    <string name="skip_for_now">Skip for now</string>
+    <string name="enable_location">Enable the location access</string>
+    <string name="location_full_message">We need your location to show you the best events happening nearby and help you discover new experiences in your area.</string>
+
+
+    <!-- Interests (labels) -->
+    <string name="interest_music">Music &amp; Concerts</string>
+    <string name="interest_food">Food &amp; Dining</string>
+    <string name="interest_arts">Arts &amp; Culture</string>
+    <string name="interest_gaming">Gaming &amp; Tech</string>
+    <string name="interest_sports">Sports &amp; Fitness</string>
+    <string name="interest_learning">Learning &amp; Workshops</string>
+    <string name="interest_social">Social &amp; Networking</string>
+    <string name="interest_photography">Photography</string>
+    <string name="interest_business">Business &amp; Career</string>
+    <string name="interest_health">Health &amp; Wellness</string>
 </resources>
