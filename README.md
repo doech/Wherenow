@@ -1,7 +1,7 @@
 # 📱 WhereNow
 
 Aplicación Android desarrollada en **Kotlin con Jetpack Compose** para la clase de Programación de Plataformas Móviles 
-El objetivo de WhereNow es permitir a los usuarios **registrarse, iniciar sesión, dar acceso a su ubicación, elegir intereses en un quiz y recibir recomendaciones personalizadas de eventos.**
+El objetivo de WhereNow es permitir a los usuarios crear una cuenta, y en base a un quiz, poder recomendar eventos ocurriendo cerca del usuario para que este pueda involucrarse en actividades sociales y tener círculos personalizados con amigos, conocidos o personas con los mismos intereses.
 
 ---
 
