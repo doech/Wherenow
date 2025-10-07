@@ -1,4 +1,4 @@
-package com.example.wherenow
+package com.example.wherenow.ui.location
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -11,11 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.ui.res.stringResource
+import com.example.wherenow.R
+import com.example.wherenow.ui.navigation.NavRoutes
 
 @Composable
 fun LocationScreen(navController: NavController) {
@@ -256,7 +262,7 @@ fun drawLocationPin(drawScope: DrawScope, color: Color) {
             moveTo(center.x, center.y + radius * 2)
             lineTo(center.x - radius * 1.2f, center.y - radius * 0.5f)
             arcTo(
-                rect = androidx.compose.ui.geometry.Rect(
+                rect = Rect(
                     center.x - radius * 1.2f,
                     center.y - radius * 2.5f,
                     center.x + radius * 1.2f,
@@ -329,16 +335,16 @@ fun drawCalendarIcon(drawScope: DrawScope, color: Color) {
         drawRoundRect(
             color = color,
             topLeft = Offset(center.x - width/2, center.y - height/2 + height * 0.15f),
-            size = androidx.compose.ui.geometry.Size(width, height * 0.85f),
-            cornerRadius = androidx.compose.ui.geometry.CornerRadius(4.dp.toPx())
+            size = Size(width, height * 0.85f),
+            cornerRadius = CornerRadius(4.dp.toPx())
         )
 
         // Draw calendar header
         drawRoundRect(
             color = color.copy(alpha = 0.8f),
             topLeft = Offset(center.x - width/2, center.y - height/2),
-            size = androidx.compose.ui.geometry.Size(width, height * 0.25f),
-            cornerRadius = androidx.compose.ui.geometry.CornerRadius(4.dp.toPx())
+            size = Size(width, height * 0.25f),
+            cornerRadius = CornerRadius(4.dp.toPx())
         )
 
         // Draw calendar rings
@@ -433,7 +439,7 @@ fun drawShieldIcon(drawScope: DrawScope, color: Color) {
         drawPath(
             checkPath,
             Color.White,
-            style = Stroke(width = 2.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round)
+            style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
         )
     }
 }

@@ -1,4 +1,4 @@
-package com.example.wherenow
+package com.example.wherenow.ui.quiz
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -15,19 +15,24 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.wherenow.R
+import com.example.wherenow.ui.navigation.NavRoutes
 
 // =========================
 // Datos
@@ -381,7 +386,7 @@ fun InterestChip(label: String) {
 fun CustomIcon(
     iconType: String,
     color: Color,
-    size: androidx.compose.ui.unit.Dp,
+    size: Dp,
     modifier: Modifier = Modifier
 ) {
     Canvas(modifier = modifier.size(size)) {
@@ -425,7 +430,7 @@ fun DrawScope.drawArtsIcon(color: Color) {
 }
 
 fun DrawScope.drawGamingIcon(color: Color) {
-    drawRoundRect(color = color, topLeft = Offset(size.width * 0.1f, size.height * 0.3f), size = Size(size.width * 0.8f, size.height * 0.4f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(size.width * 0.1f))
+    drawRoundRect(color = color, topLeft = Offset(size.width * 0.1f, size.height * 0.3f), size = Size(size.width * 0.8f, size.height * 0.4f), cornerRadius = CornerRadius(size.width * 0.1f))
     drawCircle(color = Color.White, radius = size.width * 0.06f, center = Offset(size.width * 0.3f, size.height * 0.5f))
     drawCircle(color = Color.White, radius = size.width * 0.06f, center = Offset(size.width * 0.7f, size.height * 0.5f))
 }
@@ -456,13 +461,13 @@ fun DrawScope.drawSocialIcon(color: Color) {
 }
 
 fun DrawScope.drawPhotographyIcon(color: Color) {
-    drawRoundRect(color = color, topLeft = Offset(size.width * 0.1f, size.height * 0.3f), size = Size(size.width * 0.8f, size.height * 0.5f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(size.width * 0.05f))
+    drawRoundRect(color = color, topLeft = Offset(size.width * 0.1f, size.height * 0.3f), size = Size(size.width * 0.8f, size.height * 0.5f), cornerRadius = CornerRadius(size.width * 0.05f))
     drawCircle(color = Color.White, radius = size.width * 0.15f, center = Offset(size.width * 0.5f, size.height * 0.55f))
     drawRect(color = color, topLeft = Offset(size.width * 0.3f, size.height * 0.2f), size = Size(size.width * 0.4f, size.height * 0.1f))
 }
 
 fun DrawScope.drawBusinessIcon(color: Color) {
-    drawRoundRect(color = color, topLeft = Offset(size.width * 0.1f, size.height * 0.4f), size = Size(size.width * 0.8f, size.height * 0.4f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(size.width * 0.05f))
+    drawRoundRect(color = color, topLeft = Offset(size.width * 0.1f, size.height * 0.4f), size = Size(size.width * 0.8f, size.height * 0.4f), cornerRadius = CornerRadius(size.width * 0.05f))
     drawRect(color = color, topLeft = Offset(size.width * 0.3f, size.height * 0.2f), size = Size(size.width * 0.4f, size.height * 0.2f))
     drawRect(color = Color.White, topLeft = Offset(size.width * 0.45f, size.height * 0.55f), size = Size(size.width * 0.1f, size.height * 0.05f))
 }
@@ -484,7 +489,7 @@ fun DrawScope.drawArrowBackIcon(color: Color) {
         lineTo(size.width * 0.2f, size.height * 0.5f)
         lineTo(size.width * 0.6f, size.height * 0.8f)
     }
-    drawPath(path = path, color = color, style = Stroke(width = size.width * 0.1f, cap = androidx.compose.ui.graphics.StrokeCap.Round))
+    drawPath(path = path, color = color, style = Stroke(width = size.width * 0.1f, cap = StrokeCap.Round))
 }
 
 fun DrawScope.drawArrowForwardIcon(color: Color) {
@@ -493,5 +498,5 @@ fun DrawScope.drawArrowForwardIcon(color: Color) {
         lineTo(size.width * 0.8f, size.height * 0.5f)
         lineTo(size.width * 0.4f, size.height * 0.8f)
     }
-    drawPath(path = path, color = color, style = Stroke(width = size.width * 0.1f, cap = androidx.compose.ui.graphics.StrokeCap.Round))
+    drawPath(path = path, color = color, style = Stroke(width = size.width * 0.1f, cap = StrokeCap.Round))
 }
