@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.example.wherenow.ui.navigation.NavComposable
 import com.example.wherenow.ui.theme.WherenowTheme
 
 class MainActivity : ComponentActivity() {

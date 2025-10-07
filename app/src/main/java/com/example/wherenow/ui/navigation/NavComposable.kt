@@ -1,10 +1,16 @@
-package com.example.wherenow
+package com.example.wherenow.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.wherenow.ui.auth.AuthScreen
+import com.example.wherenow.ui.events.EventsScreen
+import com.example.wherenow.ui.home.HomeScreen
+import com.example.wherenow.ui.location.LocationScreen
+import com.example.wherenow.ui.quiz.QuizScreen
+import com.example.wherenow.ui.search.SearchScreen
 
 
 @Composable
@@ -20,7 +26,7 @@ fun NavComposable(
         composable(NavRoutes.AUTH)        { AuthScreen(navController) }
         composable(NavRoutes.LOCATION)     { LocationScreen(navController) }
         composable(NavRoutes.QUIZ)         { QuizScreen(navController) }
-        composable(route=NavRoutes.HOME)         { HomeScreen(navController) }
+        composable(route= NavRoutes.HOME)         { HomeScreen(navController) }
         composable(NavRoutes.SEARCH)       { SearchScreen(navController) }
         composable(NavRoutes.EVENTS)       { EventsScreen(navController) }
     }

@@ -1,4 +1,4 @@
-package com.example.wherenow
+package com.example.wherenow.ui.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.ui.res.stringResource
+import com.example.wherenow.R
+import com.example.wherenow.ui.navigation.NavRoutes
 
 @Composable
 fun AuthScreen(navController: NavController) {
