@@ -20,6 +20,8 @@ fun NavComposable(
         composable(NavRoutes.AUTH)        { AuthScreen(navController) }
         composable(NavRoutes.LOCATION)     { LocationScreen(navController) }
         composable(NavRoutes.QUIZ)         { QuizScreen(navController) }
-        composable(NavRoutes.CONFIRMATION) { ConfirmationScreen(navController) }
+        composable(route=NavRoutes.HOME)         { HomeScreen(navController) }
+        composable(NavRoutes.SEARCH)       { SearchScreen(navController) }
+        composable(NavRoutes.EVENTS)       { EventsScreen(navController) }
     }
 }
