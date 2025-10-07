@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,23 +22,39 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.compose.ui.res.stringResource
 
+// =========================
+// Datos
+// =========================
 data class InterestCategory(
     val id: String,
     val title: String,
-    val iconType: String, // identificador del ícono dibujado
+    val iconType: String,
     val color: Color
 )
+
+// =========================
+// Quiz
+// =========================
 
 @Composable
 fun QuizScreen(navController: NavController) {
     var selectedInterests by remember { mutableStateOf(setOf<String>()) }
+    var showConfirmation by remember { mutableStateOf(false) }
+
+    if (showConfirmation) {
+        ConfirmationScreen(
+            navController = navController,
+            selectedInterests = selectedInterests.toList()
+        )
+        return
+    }
 
     val interests = listOf(
         InterestCategory("music",       stringResource(R.string.interest_music),       "music",       Color(0xFF9C27B0)),
@@ -51,16 +69,12 @@ fun QuizScreen(navController: NavController) {
         InterestCategory("health",      stringResource(R.string.interest_health),      "health",      Color(0xFFF44336))
     )
 
-
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFB388FF), // morado suave
-                        Color(0xFFFF80AB)  // rosa
-                    )
+                    listOf(Color(0xFFB388FF), Color(0xFFFF80AB))
                 )
             )
     ) {
@@ -80,22 +94,19 @@ fun QuizScreen(navController: NavController) {
                 InterestSelectionScreen(
                     interests = interests,
                     selectedInterests = selectedInterests,
-                    onInterestToggle = { interestId ->
-                        selectedInterests = if (selectedInterests.contains(interestId)) {
-                            selectedInterests - interestId
-                        } else {
-                            selectedInterests + interestId
-                        }
+                    onInterestToggle = { id ->
+                        selectedInterests = if (selectedInterests.contains(id)) selectedInterests - id else selectedInterests + id
                     },
                     onContinue = {
-                        navController.navigate(NavRoutes.CONFIRMATION)
+                        showConfirmation = true
                     },
                     onBack = { navController.popBackStack() }
                 )
             }
+            }
         }
     }
-}
+
 
 @Composable
 fun InterestSelectionScreen(
@@ -105,9 +116,7 @@ fun InterestSelectionScreen(
     onContinue: () -> Unit,
     onBack: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(R.string.quiz_title),
             fontSize = 24.sp,
@@ -116,7 +125,7 @@ fun InterestSelectionScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(Modifier.height(8.dp))
 
         Text(
             text = stringResource(R.string.quiz_subtitle),
@@ -125,7 +134,7 @@ fun InterestSelectionScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(Modifier.height(32.dp))
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
@@ -142,7 +151,7 @@ fun InterestSelectionScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -154,8 +163,8 @@ fun InterestSelectionScreen(
                 colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF718096))
             ) {
                 CustomIcon(iconType = "arrow_back", color = Color(0xFF718096), size = 16.dp)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.back)+">")
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.back))
             }
 
             Button(
@@ -173,7 +182,7 @@ fun InterestSelectionScreen(
                     color = Color.White,
                     fontWeight = FontWeight.Medium
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(Modifier.width(8.dp))
                 CustomIcon(iconType = "arrow_forward", color = Color.White, size = 16.dp)
             }
         }
@@ -193,11 +202,7 @@ fun InterestCard(
             .clickable { onClick() }
             .then(
                 if (isSelected) {
-                    Modifier.border(
-                        2.dp,
-                        Color(0xFF9C27B0),
-                        RoundedCornerShape(16.dp)
-                    )
+                    Modifier.border(2.dp, Color(0xFF9C27B0), RoundedCornerShape(16.dp))
                 } else {
                     Modifier
                 }
@@ -215,14 +220,8 @@ fun InterestCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            CustomIcon(
-                iconType = interest.iconType,
-                color = interest.color,
-                size = 24.dp
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
+            CustomIcon(interest.iconType, interest.color, 24.dp)
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = interest.title,
                 fontSize = 12.sp,
@@ -235,6 +234,149 @@ fun InterestCard(
     }
 }
 
+// =========================
+// Confirmation
+// =========================
+
+@Composable
+fun ConfirmationScreen(
+    navController: NavController,
+    selectedInterests: List<String>
+) {
+    val interests = selectedInterests.ifEmpty {
+        listOf(
+        "Health & Wellness",
+        "Photography",
+        "Social & Networking"
+    )
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0xFFB388FF), Color(0xFFFF80AB))
+                )
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(6.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.confirmation_title),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+
+                Text(
+                    text = stringResource(R.string.confirmation_selected, interests.size),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = Color(0xFF9C27B0),
+                    modifier = Modifier.size(48.dp)
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    text = stringResource(R.string.confirmation_message),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 140.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    userScrollEnabled = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 0.dp, max = 200.dp)
+                ) {
+                    items(interests) { label ->
+                        InterestChip(label)
+                    }
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            stringResource(R.string.what_happens_next),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text("• " + stringResource(R.string.bullet_recommendations))
+                        Text("• " + stringResource(R.string.bullet_update))
+                        Text("• " + stringResource(R.string.bullet_discover))
+                    }
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = { navController.popBackStack() }) {
+                        Text(stringResource(R.string.back))
+                    }
+                    Button(
+                        onClick = { navController.navigate(NavRoutes.AUTH) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0))
+                    ) {
+                        Text(stringResource(R.string.start_exploring))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun InterestChip(label: String) {
+    Surface(
+        shape = RoundedCornerShape(50),
+        color = Color(0xFFEDE7F6),
+        modifier = Modifier.padding(horizontal = 4.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            color = Color(0xFF512DA8)
+        )
+    }
+}
+
+// =========================
+// Iconos dibujados (Canvas)
+// =========================
 @Composable
 fun CustomIcon(
     iconType: String,
@@ -242,9 +384,7 @@ fun CustomIcon(
     size: androidx.compose.ui.unit.Dp,
     modifier: Modifier = Modifier
 ) {
-    Canvas(
-        modifier = modifier.size(size)
-    ) {
+    Canvas(modifier = modifier.size(size)) {
         when (iconType) {
             "music" -> drawMusicIcon(color)
             "food" -> drawFoodIcon(color)
@@ -262,8 +402,6 @@ fun CustomIcon(
         }
     }
 }
-
-// ===== Íconos dibujados (reutilizados por las tarjetas) =====
 
 fun DrawScope.drawMusicIcon(color: Color) {
     drawCircle(color = color, radius = size.width * 0.15f, center = Offset(size.width * 0.3f, size.height * 0.7f))
