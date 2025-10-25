@@ -352,7 +352,7 @@ fun ConfirmationScreen(
                         Text(stringResource(R.string.back))
                     }
                     Button(
-                        onClick = { navController.navigate(NavRoutes.AUTH) },
+                        onClick = { navController.navigate(NavRoutes.HOME) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0))
                     ) {
                         Text(stringResource(R.string.start_exploring))
