@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun CreateCircleDialog(
+fun CreateCircle(
     onDismiss: () -> Unit,
     onCreate: (String, String, Boolean) -> Unit // name, desc, isPrivate
 ) {
@@ -115,4 +115,3 @@ fun CreateCircleDialog(
         }
     }
 }
-
