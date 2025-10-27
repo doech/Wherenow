@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
@@ -21,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
 // -----------------------------------------------------------------------------
 // 🧩 MODELO LOCAL DE DATOS
@@ -92,98 +93,120 @@ fun HomeScreen(navController: NavController) {
     // 🔔 estado para abrir/cerrar el diálogo de creación
     var showDialog by remember { mutableStateOf(false) }
 
-    // -------------------------------------------------------------------------
-    // 🔝 ESTRUCTURA PRINCIPAL
-    // -------------------------------------------------------------------------
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        // 🔔 Iconos de notificaciones y ajustes
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            IconButton(onClick = { navController.navigate("Pega_aquí_tu_ruta_de_notificaciones") }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notifications")
-            }
-            IconButton(onClick = { navController.navigate("Pega_aquí_tu_ruta_de_configuración") }) {
-                Icon(Icons.Default.Settings, contentDescription = "Settings")
-            }
-        }
+    // 🎉 estado para mostrar el popup de evento aceptado
+    var showEventAcceptedPopup by remember { mutableStateOf(false) }
 
-        // 👤 Encabezado del usuario
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFCCCCCC))
-                    .clickable { navController.navigate("Pega_aquí_tu_ruta_de_perfil") }
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                Text("Usuario", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text("@Usuario123", color = Color.Gray, fontSize = 14.sp)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 🔹 Sección "Your Circles" con botón +New Circle
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Your Circles", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Button(
-                // ✅ ahora abre el diálogo en lugar de navegar
-                onClick = { showDialog = true },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text("+ New Circle")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // 🟣 Lista de círculos
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.weight(1f)
-        ) {
-            items(mockCircles) { circle ->
-                CircleCard(circle) {
-                    navController.navigate("Pega_aquí_tu_ruta_para_circleDetail/${circle.name}")
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // ⬇️ Barra inferior de navegación
-        BottomNavigationBar(navController)
+    // 🚀 NUEVO: Mostrar popup automáticamente al entrar
+    LaunchedEffect(Unit) {
+        delay(500) // espera medio segundo para que la pantalla cargue
+        showEventAcceptedPopup = true
     }
 
     // -------------------------------------------------------------------------
-    // 🪟 Diálogo emergente para crear círculo (popup)
+    // 🔝 ESTRUCTURA PRINCIPAL
     // -------------------------------------------------------------------------
-    if (showDialog) {
-        // Si tu composable se llama distinto, cambia el nombre aquí:
-        CreateCircle(
-            onDismiss = { showDialog = false },
-            onCreate = { name, desc, isPrivate ->
-                // Aquí simulas guardar el círculo (puedes agregarlo a una lista en VM)
-                println("Circle created: $name | $desc | Private? $isPrivate")
-                showDialog = false
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            // 🔔 Iconos de notificaciones y ajustes
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = { navController.navigate("Pega_aquí_tu_ruta_de_notificaciones") }) {
+                    Icon(Icons.Default.Notifications, contentDescription = "Notifications")
+                }
+                IconButton(onClick = { navController.navigate("Pega_aquí_tu_ruta_de_configuración") }) {
+                    Icon(Icons.Default.Settings, contentDescription = "Settings")
+                }
             }
-        )
+
+            // 👤 Encabezado del usuario
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFCCCCCC))
+                        .clickable { navController.navigate("Pega_aquí_tu_ruta_de_perfil") }
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text("Usuario", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text("@Usuario123", color = Color.Gray, fontSize = 14.sp)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 🔹 Sección "Your Circles" con botón +New Circle
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Your Circles", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Button(
+                    onClick = { showDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("+ New Circle")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 🟣 Lista de círculos
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                items(mockCircles) { circle ->
+                    CircleCard(circle) {
+                        navController.navigate("Pega_aquí_tu_ruta_para_circleDetail/${circle.name}")
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // ⬇️ Barra inferior de navegación
+            BottomNavigationBar(navController)
+        }
+
+        // -------------------------------------------------------------------------
+        // 🪟 Diálogo emergente para crear círculo (popup)
+        // -------------------------------------------------------------------------
+        if (showDialog) {
+            CreateCircle(
+                onDismiss = { showDialog = false },
+                onCreate = { name, desc, isPrivate ->
+                    println("Circle created: $name | $desc | Private? $isPrivate")
+                    showDialog = false
+                }
+            )
+        }
+
+        // -------------------------------------------------------------------------
+        // 🎉 Popup de evento aceptado - APARECE AUTOMÁTICAMENTE
+        // -------------------------------------------------------------------------
+        if (showEventAcceptedPopup) {
+            EventAcceptedPopup(
+                eventInfo = EventInfo(
+                    name = "Food Truck Festival",
+                    description = "Over 20 gourmet food trucks featuring cuisines from around the world",
+                    hasPlusOnePrivilege = true
+                ),
+                onDismiss = { showEventAcceptedPopup = false }
+            )
+        }
     }
 }
 
@@ -268,12 +291,6 @@ fun BottomNavigationBar(navController: NavController) {
             onClick = { navController.navigate("search") },
             icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
             label = { Text("Search") }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate("events") },
-            icon = { Icon(Icons.Default.Event, contentDescription = "Events") },
-            label = { Text("Events") }
         )
     }
 }
