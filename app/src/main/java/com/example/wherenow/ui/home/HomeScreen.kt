@@ -30,6 +30,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import androidx.compose.material.icons.filled.Event
+
+
 
 // -----------------------------------------------------------------------------
 // 🧩 MODELO LOCAL DE DATOS
@@ -291,6 +294,12 @@ fun BottomNavigationBar(navController: NavController) {
             onClick = { navController.navigate("search") },
             icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
             label = { Text("Search") }
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = { navController.navigate("events") },
+            icon = { Icon(Icons.Default.Event, contentDescription = "Events") },
+            label = { Text("Events") }
         )
     }
 }
