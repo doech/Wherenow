@@ -74,13 +74,29 @@ El objetivo es permitir:
 
 ---
 
+# 📘 WhereNow – Estructura de Base de Datos (Firestore)
+
+## 📖 Descripción General
+
+WhereNow es una aplicación móvil desarrollada en Kotlin + Jetpack Compose que conecta usuarios con eventos locales y comunidades afines.  
+Esta base de datos en **Firebase Firestore** utiliza un modelo **híbrido** entre relaciones implícitas y subcolecciones para equilibrar escalabilidad, rendimiento y simplicidad en consultas.
+
+El objetivo es permitir:
+- Autenticación y perfiles de usuario.
+- Gestión de eventos geolocalizados.
+- Creación y participación en círculos (grupos sociales).
+- Comunicación en tiempo real mediante subcolecciones de chat.
+- Personalización de experiencia mediante intereses (categorías).
+
+---
+
 ## 🏗️ Arquitectura de Datos
 
 ### 📂 Colección general: `/users`
 
 Guarda la información principal de cada usuario.
 
-```json
+json
 {
   "id": "user_123",
   "name": "David Hernandez",
