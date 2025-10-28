@@ -391,7 +391,6 @@ Formato estándar:
 
 ---
 
-**Autor:** David Hernández  
 **Versión del esquema:** 1.0.0  
 **Última actualización:** Octubre 2025
 
