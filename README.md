@@ -90,13 +90,29 @@ El objetivo es permitir:
 
 ---
 
-## 🏗️ Arquitectura de Datos
+# 📘 WhereNow – Estructura de Base de Datos (Firestore)
+
+## 📖 Descripción General
+
+WhereNow es una aplicación móvil desarrollada en Kotlin + Jetpack Compose que conecta usuarios con eventos locales y comunidades afines.  
+Esta base de datos en **Firebase Firestore** utiliza un modelo **híbrido** entre relaciones implícitas y subcolecciones para equilibrar escalabilidad, rendimiento y simplicidad en consultas.
+
+El objetivo es permitir:
+- Autenticación y perfiles de usuario.
+- Gestión de eventos geolocalizados.
+- Creación y participación en círculos (grupos sociales).
+- Comunicación en tiempo real mediante subcolecciones de chat.
+- Personalización de experiencia mediante intereses (categorías).
+
+---
+
+## 🎗️ Arquitectura de Datos
 
 ### 📂 Colección general: `/users`
 
 Guarda la información principal de cada usuario.
 
-json
+```json
 {
   "id": "user_123",
   "name": "David Hernandez",
@@ -113,44 +129,48 @@ json
   "createdAt": <serverTimestamp>,
   "status": "active"
 }
-🔸 Subcolección: /users/{userId}/events
-Eventos donde el usuario participa o que ha creado.
+```
 
-json
-Copy code
+#### 🔸 Subcolección: `/users/{userId}/events`
+Eventos donde el usuario participa o que ha creado.
+```json
 {
   "eventId": "E001",
   "joinedAt": <serverTimestamp>,
   "role": "participant"
 }
-🔸 Subcolección: /users/{userId}/circles
-Círculos a los que pertenece el usuario.
+```
 
-json
-Copy code
+#### 🔸 Subcolección: `/users/{userId}/circles`
+Círculos a los que pertenece el usuario.
+```json
 {
   "circleId": "C001",
   "joinedAt": <serverTimestamp>,
   "role": "member"
 }
-🔸 Subcolección: /users/{userId}/categories
-Intereses o categorías seleccionadas por el usuario (relación usuario ↔ categoría).
+```
 
-json
-Copy code
+#### 🔸 Subcolección: `/users/{userId}/categories`
+Intereses o categorías seleccionadas por el usuario (relación usuario ↔ categoría).
+```json
 {
   "categoryId": "music",
   "selectedAt": <serverTimestamp>
 }
-📂 Colección general: /events
+```
+
+---
+
+### 📂 Colección general: `/events`
+
 Representa eventos reales dentro de la aplicación.
 
-json
-Copy code
+```json
 {
   "id": "E001",
   "name": { "en": "Food Truck Festival", "es": "Festival de food trucks" },
-  "description": { 
+  "description": {
     "en": "Local street food event with live music.",
     "es": "Evento de comida callejera con música en vivo."
   },
@@ -170,33 +190,33 @@ Copy code
   "status": "active",
   "createdAt": <serverTimestamp>
 }
-🔸 Subcolección: /events/{eventId}/comments
-Comentarios de los usuarios dentro del evento.
+```
 
-json
-Copy code
+#### 🔸 Subcolección: `/events/{eventId}/comments`
+Comentarios de los usuarios dentro del evento.
+```json
 {
   "id": "comment_001",
   "userId": "user_456",
   "text": "Great music yesterday!",
   "createdAt": <serverTimestamp>
 }
-🔸 Subcolección: /events/{eventId}/chat
-Mensajes en tiempo real del evento.
+```
 
-json
-Copy code
+#### 🔸 Subcolección: `/events/{eventId}/chat`
+Mensajes en tiempo real del evento.
+```json
 {
   "id": "message_001",
   "senderId": "user_789",
   "message": "Who's coming tonight?",
   "createdAt": <serverTimestamp>
 }
-🔸 Subcolección: /events/{eventId}/media
-Archivos multimedia asociados al evento (imágenes, flyers, etc.).
+```
 
-json
-Copy code
+#### 🔸 Subcolección: `/events/{eventId}/media`
+Archivos multimedia asociados al evento (imágenes, flyers, etc.).
+```json
 {
   "id": "media_001",
   "url": "https://firebasestorage.googleapis.com/...",
@@ -204,11 +224,15 @@ Copy code
   "uploadedBy": "user_123",
   "createdAt": <serverTimestamp>
 }
-📂 Colección general: /circles
+```
+
+---
+
+### 📂 Colección general: `/circles`
+
 Representa grupos sociales creados por usuarios con intereses comunes.
 
-json
-Copy code
+```json
 {
   "id": "C001",
   "name": "Music Lovers Network",
@@ -221,21 +245,21 @@ Copy code
   "status": "active",
   "createdAt": <serverTimestamp>
 }
-🔸 Subcolección: /circles/{circleId}/members
-Miembros del círculo.
+```
 
-json
-Copy code
+#### 🔸 Subcolección: `/circles/{circleId}/members`
+Miembros del círculo.
+```json
 {
   "userId": "user_123",
   "role": "admin",
   "joinedAt": <serverTimestamp>
 }
-🔸 Subcolección: /circles/{circleId}/posts
-Publicaciones internas (reemplaza el concepto de “posts” globales).
+```
 
-json
-Copy code
+#### 🔸 Subcolección: `/circles/{circleId}/posts`
+Publicaciones internas (reemplaza el concepto de “posts” globales).
+```json
 {
   "id": "post_001",
   "authorId": "user_789",
@@ -243,23 +267,27 @@ Copy code
   "eventRef": "/events/E001",
   "createdAt": <serverTimestamp>
 }
-🔸 Subcolección: /circles/{circleId}/chat
-Mensajes en tiempo real dentro del grupo.
+```
 
-json
-Copy code
+#### 🔸 Subcolección: `/circles/{circleId}/chat`
+Mensajes en tiempo real dentro del grupo.
+```json
 {
   "id": "message_001",
   "senderId": "user_789",
   "message": "Let's meet there at 8pm!",
   "createdAt": <serverTimestamp>
 }
-📂 Colección general: /categories
-Catálogo de categorías utilizadas para eventos, círculos e intereses de usuario.
-Este contenido es quemado y multilenguaje.
+```
 
-json
-Copy code
+---
+
+### 🏷️ Colección general: `/categories`
+
+Catálogo de categorías utilizadas para eventos, círculos e intereses de usuario.  
+Este contenido es **quemado y multilenguaje**.
+
+```json
 {
   "id": "music",
   "name": { "en": "Music", "es": "Música" },
@@ -268,11 +296,15 @@ Copy code
   "status": "active",
   "createdAt": <serverTimestamp>
 }
-⚙️ Colección opcional: /app_metadata
+```
+
+---
+
+### ⚙️ Colección opcional: `/app_metadata`
+
 Configuraciones globales del sistema.
 
-json
-Copy code
+```json
 {
   "version": "1.0.0",
   "minSupportedVersion": "0.9.0",
@@ -280,46 +312,52 @@ Copy code
   "supportedLanguages": ["en", "es"],
   "createdAt": <serverTimestamp>
 }
-🔗 Relaciones Principales
-Relación	Descripción
-/users/{id}/events → /events/{eventId}	Registra la participación de un usuario en un evento.
-/users/{id}/circles → /circles/{circleId}	Conecta al usuario con los círculos donde participa.
-/users/{id}/categories → /categories/{categoryId}	Define los intereses del usuario.
-/circles/{circleId}/posts.eventRef → /events/{eventId}	Permite enlazar publicaciones con eventos.
-/events/{eventId}/comments.userId → /users/{id}	Asocia comentarios con el autor correspondiente.
+```
 
-🌍 Soporte Multilenguaje
-Los campos multilenguaje solo se aplican a datos estáticos o predefinidos, como:
+---
 
-categories.name
+## 🔗 Relaciones Principales
 
-events.name
+| Relación | Descripción |
+|-----------|--------------|
+| `/users/{id}/events → /events/{eventId}` | Registra la participación de un usuario en un evento. |
+| `/users/{id}/circles → /circles/{circleId}` | Conecta al usuario con los círculos donde participa. |
+| `/users/{id}/categories → /categories/{categoryId}` | Define los intereses del usuario. |
+| `/circles/{circleId}/posts.eventRef → /events/{eventId}` | Permite enlazar publicaciones con eventos. |
+| `/events/{eventId}/comments.userId → /users/{id}` | Asocia comentarios con el autor correspondiente. |
 
-events.description
+---
+
+## 🌍 Soporte Multilenguaje
+
+Los campos multilenguaje solo se aplican a **datos estáticos o predefinidos**, como:
+- `categories.name`
+- `events.name`
+- `events.description`
 
 No se usa en contenido dinámico (comentarios, mensajes, etc.).
 
 Formato estándar:
-
-json
-Copy code
+```json
 "name": { "en": "Music", "es": "Música" }
-🧠 Notas de Diseño
-Cada documento incluye createdAt y status para control y trazabilidad.
+```
 
-Las subcolecciones son opcionales, se crean solo cuando hay datos.
+---
 
-La estructura está optimizada para:
+## 🧠 Notas de Diseño
 
-Consultas rápidas por usuario, evento o círculo.
+- Cada documento incluye `createdAt` y `status` para control y trazabilidad.
+- Las **subcolecciones son opcionales**, se crean solo cuando hay datos.
+- La estructura está optimizada para:
+  - Consultas rápidas por usuario, evento o círculo.
+  - Filtro por categorías (intereses).
+  - Soporte de tiempo real con Firestore listeners.
 
-Filtro por categorías (intereses).
+---
 
-Soporte de tiempo real con Firestore listeners.
+## 🧉 Ejemplo de árbol de rutas
 
-🧩 Ejemplo de árbol de rutas
-bash
-Copy code
+```
 /users
   /{userId}
     /events
@@ -339,4 +377,22 @@ Copy code
   /{categoryId}
 /app_metadata
   /{docId}
+```
+
+---
+
+## ✅ Ventajas del Modelo
+
+- Estructura modular, escalable y sin redundancias.
+- Soporta feed social **contextualizado** dentro de círculos.
+- Permite búsquedas personalizadas por ubicación e intereses.
+- Compatible con una arquitectura híbrida (Firestore + PostgreSQL opcional).
+- Facilita sincronización y análisis de datos sin romper la jerarquía lógica.
+
+---
+
+**Autor:** David Hernández  
+**Versión del esquema:** 1.0.0  
+**Última actualización:** Octubre 2025
+
 
