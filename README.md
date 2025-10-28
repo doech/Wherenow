@@ -8,12 +8,11 @@ El objetivo de WhereNow es permitir a los usuarios crear una cuenta, y en base a
 ## 👥 Equipo de desarrollo
 **Grupo #5 - coordinadora: Alejandra Sierra**
 
-- **Alejandro Pérez** – signup / Auth  
-- **Emily Góngora** – Login / Auth  
-- **Esteban De la Peña** – Location Access / Auth
-- **Martín Villatoro** – Quiz  
-- **Camila Sandoval** – Confirmación / Diseño de pantallas y logo
-- **Alejandra Sierra** - Confirmación / NavComposable y NavRoutes 
+- **Alejandro Pérez**  
+- **Emily Góngora**  
+- **Esteban De la Peña** 
+- **Martín Villatoro**   
+- **Camila Sandoval** 
 
 ---
 
@@ -21,72 +20,6 @@ El objetivo de WhereNow es permitir a los usuarios crear una cuenta, y en base a
 
 WhereNow guía al usuario a través de un flujo de pantallas que van desde el **registro/login** hasta la **selección de intereses**, utilizando un sistema de navegación basado en **NavHost** y rutas centralizadas.  
 La aplicación también implementa **buenas prácticas**, como el uso de `strings.xml` para los textos y un ícono personalizado en el launcher.
-
----
-
-## 🖼️ Pantallas implementadas
-
-- **AuthScreen**  
-  - Tabs para Login y Sign Up en una sola pantalla.  
-  - Validación básica de email y password.  
-  - Uso de `strings.xml` para textos.  
-
-- **LocationScreen**  
-  - Explicación de beneficios de compartir ubicación.  
-  - Botón principal “Allow Location Access” y opción “Skip for now”.  
-  - Navega hacia el quiz.  
-
-- **QuizScreen**  
-  - Selección de intereses mediante `LazyVerticalGrid`.  
-  - Cada interés representado con tarjetas interactivas.  
-  - Botón “Continue” activo solo cuando se eligen al menos 3 categorías.  
-
-- **ConfirmationScreen**  
-  - Resumen de intereses seleccionados.  
-  - Explicación de los próximos pasos.  
-  - Botones de navegación para volver atrás o continuar.  
-
----
-
-## ⏳ Pantallas pendientes / Mejoras
-
-- Validación avanzada de login y signup (contra base de datos o API).  
-- Implementación de “Forgot Password”.    
-- Persistencia de intereses seleccionados (Room / DataStore).
-- Pantalla de eventos
-- Pantalla de círculos
-
----
-
-# 📘 WhereNow – Estructura de Base de Datos (Firestore)
-
-## 📖 Descripción General
-
-WhereNow es una aplicación móvil desarrollada en Kotlin + Jetpack Compose que conecta usuarios con eventos locales y comunidades afines.  
-Esta base de datos en **Firebase Firestore** utiliza un modelo **híbrido** entre relaciones implícitas y subcolecciones para equilibrar escalabilidad, rendimiento y simplicidad en consultas.
-
-El objetivo es permitir:
-- Autenticación y perfiles de usuario.
-- Gestión de eventos geolocalizados.
-- Creación y participación en círculos (grupos sociales).
-- Comunicación en tiempo real mediante subcolecciones de chat.
-- Personalización de experiencia mediante intereses (categorías).
-
----
-
-# 📘 WhereNow – Estructura de Base de Datos (Firestore)
-
-## 📖 Descripción General
-
-WhereNow es una aplicación móvil desarrollada en Kotlin + Jetpack Compose que conecta usuarios con eventos locales y comunidades afines.  
-Esta base de datos en **Firebase Firestore** utiliza un modelo **híbrido** entre relaciones implícitas y subcolecciones para equilibrar escalabilidad, rendimiento y simplicidad en consultas.
-
-El objetivo es permitir:
-- Autenticación y perfiles de usuario.
-- Gestión de eventos geolocalizados.
-- Creación y participación en círculos (grupos sociales).
-- Comunicación en tiempo real mediante subcolecciones de chat.
-- Personalización de experiencia mediante intereses (categorías).
 
 ---
 
@@ -162,34 +95,26 @@ Intereses o categorías seleccionadas por el usuario (relación usuario ↔ cate
 
 ---
 
-### 📂 Colección general: `/events`
+### 📂 Colección principal: `/events`
 
-Representa eventos reales dentro de la aplicación.
+Cada documento dentro de esta colección representa un evento publicado en la aplicación **WhereNow**.  
+La estructura refleja los campos actualmente utilizados por la app en Firestore.
+
 
 ```json
 {
-  "id": "E001",
-  "name": { "en": "Food Truck Festival", "es": "Festival de food trucks" },
-  "description": {
-    "en": "Local street food event with live music.",
-    "es": "Evento de comida callejera con música en vivo."
-  },
-  "category": "food",
-  "creatorId": "user_123",
-  "location": {
-    "address": "Parque Central, Guatemala City",
-    "lat": 14.6349,
-    "lng": -90.5069
-  },
-  "date": {
-    "start": "2025-12-05T18:00:00Z",
-    "end": "2025-12-05T23:00:00Z"
-  },
-  "visibility": "public",
-  "attendeesCount": 24,
+  "eventId": "EVT001",
+  "name": "Food Truck Festival",
+  "description": "Over 20 gourmet food trucks featuring cuisines from around the world.",
+  "location": "Brooklyn Bridge Park",
+  "distanceText": "1.2 miles away",
+  "priceText": "15",
+  "interested": 89,
   "status": "active",
-  "createdAt": <serverTimestamp>
+  "createdAt": "2025-10-27T23:45:00Z",
+  "startAt": "2025-12-05T18:00:00Z"
 }
+
 ```
 
 #### 🔸 Subcolección: `/events/{eventId}/comments`
@@ -390,8 +315,5 @@ Formato estándar:
 - Facilita sincronización y análisis de datos sin romper la jerarquía lógica.
 
 ---
-
-**Versión del esquema:** 1.0.0  
-**Última actualización:** Octubre 2025
 
 
