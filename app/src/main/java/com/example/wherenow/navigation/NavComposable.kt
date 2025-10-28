@@ -1,4 +1,4 @@
-package com.example.wherenow.ui.navigation
+package com.example.wherenow.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

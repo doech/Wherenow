@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,57 +12,62 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
+import com.example.wherenow.ui.components.BottomNavigationBar
+import androidx.navigation.compose.rememberNavController
+import com.example.wherenow.ui.components.AppHeader
 
 @Composable
 fun SearchScreen(
-    navController: NavHostController? = null,
+    navController: NavController,
     viewModel: SearchViewModel = viewModel(),
     onNavigateToEvent: (String) -> Unit = {},
     onNavigateToCircle: (String) -> Unit = {},
-    onNavigateToProfile: (String) -> Unit = {},
-    onNavigateToCircles: () -> Unit = {},
-    onNavigateToEvents: () -> Unit = {}
-)
-{
+    onNavigateToProfile: (String) -> Unit = {}
+) {
     val query by viewModel.query.collectAsState()
     val selectedFilter by viewModel.selectedFilter.collectAsState()
     val searchResults by viewModel.searchResults.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+    val headerHeight = 172.dp
+
     Scaffold(
-        bottomBar = {
-            BottomNavigationBar(
-                selectedTab = "Search",
-                onNavigateToCircles = onNavigateToCircles,
-                onNavigateToEvents = onNavigateToEvents
-            )
-        }
+        containerColor = Color(0xFFF7F6FB), // fondo claro como en Events
+        bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF9C27B0), // Morado
-                            Color(0xFFE91E63)  // Rosa
-                        )
-                    )
-                )
                 .padding(paddingValues)
+                .background(Color(0xFFF7F6FB))
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                SearchHeader()
-                Spacer(modifier = Modifier.height(24.dp))
+            // Header reutilizable (gradiente SOLO arriba)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(headerHeight)
+            ) {
+                AppHeader(
+                    userName = "Usuario",
+                    handle = "@Usuario123",
+                    onProfileClick = { /* navController.navigate("profile") si quieres */ }
+                )
+            }
+
+            // Contenido bajo el header
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = headerHeight + 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+            ) {
+                // Tarjeta de búsqueda (estilo tarjeta blanca con bordes redondeados)
                 SearchCard(
                     query = query,
                     selectedFilter = selectedFilter,
@@ -71,31 +75,39 @@ fun SearchScreen(
                     onFilterChange = { viewModel.updateFilter(it) },
                     hasResults = searchResults.isNotEmpty()
                 )
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 when {
                     isLoading -> Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator(color = Color.White) }
+                    ) { CircularProgressIndicator() }
 
                     searchResults.isEmpty() && query.isBlank() -> Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.7f),
+                                tint = Color(0xFFB0B0B0),
                                 modifier = Modifier.size(64.dp)
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 text = "Start Searching",
-                                color = Color.White,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Medium
+                                color = Color(0xFF3F3F3F),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Find events, circles, and people that match your interests",
+                                color = Color(0xFF7A7A7A),
+                                fontSize = 13.sp
                             )
                         }
                     }
@@ -116,66 +128,6 @@ fun SearchScreen(
     }
 }
 
-@Composable
-fun SearchHeader() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "User",
-                    tint = Color(0xFF9C27B0)
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "@Usuario123",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
-
-        Row {
-            Box {
-                IconButton(onClick = { /* TODO: Abrir notificaciones */ }) {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = "Notifications",
-                        tint = Color.White
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(Color.Red)
-                        .align(Alignment.TopEnd)
-                        .offset(x = (-8).dp, y = 8.dp)
-                )
-            }
-            IconButton(onClick = { /* TODO: Abrir configuración */ }) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
-                    tint = Color.White
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun SearchCard(
@@ -186,26 +138,29 @@ fun SearchCard(
     hasResults: Boolean
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             OutlinedTextField(
                 value = query,
                 onValueChange = onQueryChange,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Search...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                placeholder = { Text("Search events, circles, or people...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF9C27B0),
-                    unfocusedBorderColor = Color.LightGray
+                    focusedBorderColor = Color(0xFF7E57C2),
+                    unfocusedBorderColor = Color(0xFFE3E3E3),
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
                 )
             )
+
             Spacer(modifier = Modifier.height(12.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -215,9 +170,12 @@ fun SearchCard(
                         selected = selectedFilter == filter,
                         onClick = { onFilterChange(filter) },
                         label = { Text(filter) },
+                        shape = RoundedCornerShape(24.dp),
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Color(0xFF9C27B0),
-                            selectedLabelColor = Color.White
+                            selectedContainerColor = Color(0xFF7E57C2),
+                            selectedLabelColor = Color.White,
+                            containerColor = Color(0xFFF4F4F6),
+                            labelColor = Color(0xFF3F3F3F)
                         )
                     )
                 }
@@ -289,36 +247,10 @@ fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
     }
 }
 
-@Composable
-fun BottomNavigationBar(
-    selectedTab: String,
-    onNavigateToCircles: () -> Unit,
-    onNavigateToEvents: () -> Unit
-) {
-    NavigationBar(containerColor = Color.White) {
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Group, contentDescription = "Circles") },
-            label = { Text("Circles") },
-            selected = selectedTab == "Circles",
-            onClick = onNavigateToCircles
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-            label = { Text("Search") },
-            selected = selectedTab == "Search",
-            onClick = { /* Ya estamos aquí */ }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Event, contentDescription = "Events") },
-            label = { Text("Events") },
-            selected = selectedTab == "Events",
-            onClick = onNavigateToEvents
-        )
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewSearchScreen() {
-    MaterialTheme { SearchScreen() }
+    val navController = rememberNavController()
+    MaterialTheme { SearchScreen(navController = navController) }
 }

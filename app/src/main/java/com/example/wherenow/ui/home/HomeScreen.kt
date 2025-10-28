@@ -2,7 +2,6 @@ package com.example.wherenow.ui.home
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,11 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -29,14 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
-import androidx.compose.material.icons.filled.Event
+import com.example.wherenow.ui.components.BottomNavigationBar
+import com.example.wherenow.ui.components.AppHeader
 
 
-
-// -----------------------------------------------------------------------------
-// 🧩 MODELO LOCAL DE DATOS
-// -----------------------------------------------------------------------------
 data class Circle(
     val name: String,
     val description: String,
@@ -47,108 +37,45 @@ data class Circle(
     val color: Color
 )
 
-// -----------------------------------------------------------------------------
-// 🏠 HOME SCREEN
-// -----------------------------------------------------------------------------
 @Composable
 fun HomeScreen(navController: NavController) {
     val mockCircles = remember {
         listOf(
-            Circle(
-                name = "Music Lovers Network",
-                description = "Discussing concerts and music",
-                members = 24,
-                timeAgo = "2m ago",
-                lastMessage = "Anyone going to the jazz festival?",
-                isPublic = true,
-                color = Color(0xFF9C27B0)
-            ),
-            Circle(
-                name = "Foodie Adventures",
-                description = "Private group for food events",
-                members = 8,
-                timeAgo = "1h ago",
-                lastMessage = "Found an amazing new...",
-                isPublic = false,
-                color = Color(0xFFFF5722)
-            ),
-            Circle(
-                name = "Art Gallery Walks",
-                description = "Weekly art gallery visits",
-                members = 15,
-                timeAgo = "3h ago",
-                lastMessage = "Next gallery walk is this Satur...",
-                isPublic = true,
-                color = Color(0xFFE91E63)
-            ),
-            Circle(
-                name = "Tech Meetup Sessions",
-                description = "Private tech networking group",
-                members = 12,
-                timeAgo = "1d ago",
-                lastMessage = "Great presentation at...",
-                isPublic = false,
-                color = Color(0xFF2196F3)
-            )
+            Circle("Music Lovers Network","Discussing concerts and music",24,"2m ago","Anyone going to the jazz festival?",true, Color(0xFF9C27B0)),
+            Circle("Foodie Adventures","Private group for food events",8,"1h ago","Found an amazing new...",false, Color(0xFFFF5722)),
+            Circle("Art Gallery Walks","Weekly art gallery visits",15,"3h ago","Next gallery walk is this Satur...",true, Color(0xFFE91E63)),
+            Circle("Tech Meetup Sessions","Private tech networking group",12,"1d ago","Great presentation at...",false, Color(0xFF2196F3))
         )
     }
 
-    // 🔔 estado para abrir/cerrar el diálogo de creación
     var showDialog by remember { mutableStateOf(false) }
-
-    // 🎉 estado para mostrar el popup de evento aceptado
     var showEventAcceptedPopup by remember { mutableStateOf(false) }
 
-    // 🚀 NUEVO: Mostrar popup automáticamente al entrar
-    LaunchedEffect(Unit) {
-        delay(500) // espera medio segundo para que la pantalla cargue
-        showEventAcceptedPopup = true
-    }
+    LaunchedEffect(Unit) { showEventAcceptedPopup = true }
 
-    // -------------------------------------------------------------------------
-    // 🔝 ESTRUCTURA PRINCIPAL
-    // -------------------------------------------------------------------------
+    val headerHeight = 172.dp
+
     Box(modifier = Modifier.fillMaxSize()) {
+        // Header con gradiente (AppHeader)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(headerHeight)
+        ) {
+            AppHeader(
+                userName = "Usuario",
+                handle = "@Usuario123",
+                onProfileClick = { navController.navigate("Pega_aquí_tu_ruta_de_perfil") }
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = headerHeight + 8.dp)
                 .background(Color.White)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            // 🔔 Iconos de notificaciones y ajustes
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(onClick = { navController.navigate("Pega_aquí_tu_ruta_de_notificaciones") }) {
-                    Icon(Icons.Default.Notifications, contentDescription = "Notifications")
-                }
-                IconButton(onClick = { navController.navigate("Pega_aquí_tu_ruta_de_configuración") }) {
-                    Icon(Icons.Default.Settings, contentDescription = "Settings")
-                }
-            }
-
-            // 👤 Encabezado del usuario
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFCCCCCC))
-                        .clickable { navController.navigate("Pega_aquí_tu_ruta_de_perfil") }
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text("Usuario", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Text("@Usuario123", color = Color.Gray, fontSize = 14.sp)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 🔹 Sección "Your Circles" con botón +New Circle
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -159,14 +86,11 @@ fun HomeScreen(navController: NavController) {
                     onClick = { showDialog = true },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
                     shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("+ New Circle")
-                }
+                ) { Text("+ New Circle") }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 🟣 Lista de círculos
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
@@ -179,27 +103,16 @@ fun HomeScreen(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            // ⬇️ Barra inferior de navegación
             BottomNavigationBar(navController)
         }
 
-        // -------------------------------------------------------------------------
-        // 🪟 Diálogo emergente para crear círculo (popup)
-        // -------------------------------------------------------------------------
         if (showDialog) {
             CreateCircle(
                 onDismiss = { showDialog = false },
-                onCreate = { name, desc, isPrivate ->
-                    println("Circle created: $name | $desc | Private? $isPrivate")
-                    showDialog = false
-                }
+                onCreate = { _, _, _ -> showDialog = false }
             )
         }
 
-        // -------------------------------------------------------------------------
-        // 🎉 Popup de evento aceptado - APARECE AUTOMÁTICAMENTE
-        // -------------------------------------------------------------------------
         if (showEventAcceptedPopup) {
             EventAcceptedPopup(
                 eventInfo = EventInfo(
@@ -213,9 +126,7 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
-// -----------------------------------------------------------------------------
-// 🃏 TARJETA DE CADA CÍRCULO
-// -----------------------------------------------------------------------------
+
 @Composable
 fun CircleCard(circle: Circle, onClick: () -> Unit) {
     Card(
@@ -274,32 +185,5 @@ fun CircleCard(circle: Circle, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis
             )
         }
-    }
-}
-
-// -----------------------------------------------------------------------------
-// ⚓️ BARRA DE NAVEGACIÓN INFERIOR
-// -----------------------------------------------------------------------------
-@Composable
-fun BottomNavigationBar(navController: NavController) {
-    NavigationBar {
-        NavigationBarItem(
-            selected = true,
-            onClick = { navController.navigate("home") },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Circles") }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate("search") },
-            icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-            label = { Text("Search") }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate("events") },
-            icon = { Icon(Icons.Default.Event, contentDescription = "Events") },
-            label = { Text("Events") }
-        )
     }
 }
