@@ -25,6 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.wherenow.ui.components.BottomNavigationBar
 import com.example.wherenow.ui.components.AppHeader
+import android.net.Uri
+import androidx.compose.ui.graphics.toArgb
+import com.example.wherenow.navigation.NavRoutes
 
 
 data class Circle(
@@ -36,6 +39,7 @@ data class Circle(
     val isPublic: Boolean,
     val color: Color
 )
+
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -97,7 +101,11 @@ fun HomeScreen(navController: NavController) {
             ) {
                 items(mockCircles) { circle ->
                     CircleCard(circle) {
-                        navController.navigate("Pega_aquí_tu_ruta_para_circleDetail/${circle.name}")
+                        val encodedName = Uri.encode(circle.name)
+                        val members = circle.members
+                        val colorArgb = circle.color.toArgb()
+
+                        navController.navigate("${NavRoutes.CHAT}/$encodedName/$members/$colorArgb")
                     }
                 }
             }

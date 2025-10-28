@@ -40,8 +40,6 @@ import androidx.compose.runtime.LaunchedEffect
 @Composable
 fun EventsScreen(navController: NavController) {
     val repo = remember { FirestoreEventRepository() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     var events by remember { mutableStateOf<List<EventRow>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
