@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.wherenow.R
-import com.example.wherenow.ui.navigation.NavRoutes
+import com.example.wherenow.navigation.NavRoutes
 
 // =========================
 // Datos
@@ -352,7 +352,7 @@ fun ConfirmationScreen(
                         Text(stringResource(R.string.back))
                     }
                     Button(
-                        onClick = { navController.navigate(NavRoutes.AUTH) },
+                        onClick = { navController.navigate(NavRoutes.HOME) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0))
                     ) {
                         Text(stringResource(R.string.start_exploring))

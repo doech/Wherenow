@@ -1,4 +1,4 @@
-package com.example.wherenow.ui.navigation
+package com.example.wherenow.navigation
 
 object NavRoutes {
     const val AUTH = "auth"

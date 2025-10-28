@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.ui.res.stringResource
 import com.example.wherenow.R
-import com.example.wherenow.ui.navigation.NavRoutes
+import com.example.wherenow.navigation.NavRoutes
 
 @Composable
 fun LocationScreen(navController: NavController) {
