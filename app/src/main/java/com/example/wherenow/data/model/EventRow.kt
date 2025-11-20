@@ -8,9 +8,9 @@ data class EventRow(
     val description: String = "",
     val location: String = "",
     val distanceText: String = "",
-    val priceText: Int = 0,
+    val priceText: String = "",   // ← (antes Int, ahora String)
     val interested: Int = 0,
     val status: String = "active",
-    val createdAt: Date? = null,
-    val startAt: Date? = null
+    val createdAt: Date? = null,  // marca de tiempo Firestore → Date?
+    val startAt: Date? = null     // marca de tiempo Firestore → Date?
 )

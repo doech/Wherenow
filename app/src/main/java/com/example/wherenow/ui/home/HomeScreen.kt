@@ -27,8 +27,10 @@ import com.example.wherenow.ui.components.BottomNavigationBar
 import com.example.wherenow.ui.components.AppHeader
 import android.net.Uri
 import androidx.compose.ui.graphics.toArgb
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.wherenow.navigation.NavRoutes
-
+import com.example.wherenow.ui.auth.AuthViewModel
+import androidx.compose.runtime.collectAsState
 
 data class Circle(
     val name: String,
@@ -52,6 +54,9 @@ fun HomeScreen(navController: NavController) {
         )
     }
 
+    val authViewModel: AuthViewModel = viewModel()
+    val currentUser by authViewModel.user.collectAsState()
+
     var showDialog by remember { mutableStateOf(false) }
     var showEventAcceptedPopup by remember { mutableStateOf(false) }
 
@@ -67,9 +72,15 @@ fun HomeScreen(navController: NavController) {
                 .height(headerHeight)
         ) {
             AppHeader(
-                userName = "Usuario",
-                handle = "@Usuario123",
-                onProfileClick = { navController.navigate("Pega_aquí_tu_ruta_de_perfil") }
+                userName = currentUser?.name ?: "Usuario",
+                handle = "@${currentUser?.username ?: "usuario"}",
+                onProfileClick = { navController.navigate("profile") },
+                onLogoutClick = {
+                    authViewModel.logout()
+                    navController.navigate(NavRoutes.AUTH) {
+                        popUpTo(0)
+                    }
+                }
             )
         }
 

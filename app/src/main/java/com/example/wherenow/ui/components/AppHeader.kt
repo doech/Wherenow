@@ -20,11 +20,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Logout
+
+
 @Composable
 fun AppHeader(
     userName: String = "Usuario",
     handle: String = "@Usuario123",
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    onLogoutClick: () -> Unit = {}
 ) {
     // Gradiente SOLO arriba
     val gradient = Brush.verticalGradient(
@@ -54,6 +59,16 @@ fun AppHeader(
             Column {
                 Text(userName, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
                 Text(handle, color = Color(0xFFEDE7F6), fontSize = 13.sp)
+            }
+
+            IconButton(
+                onClick = onLogoutClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Logout,
+                    contentDescription = "Cerrar sesión",
+                    tint = Color.White
+                )
             }
         }
     }

@@ -1,5 +1,5 @@
 [versions]
-agp = "8.12.3"
+agp = "8.13.1"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -13,7 +13,9 @@ foundationLayout = "1.9.0"
 ui = "1.9.0"
 materialIconsExtended = "1.7.8"
 uiVersion = "1.9.4"
-firebaseCommonKtx = "22.0.1"
+# --- CORRECCIONES Y AÑADIDOS ---
+firebaseBom = "34.4.0" # Versión para el Bill of Materials de Firebase
+googleGmsGoogleServices = "4.4.1" # Versión del plugin de Google Services (con comilla final)
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,10 +37,18 @@ androidx-foundation-layout = { group = "androidx.compose.foundation", name = "fo
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 androidx-compose-ui-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "uiVersion" }
-firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommonKtx" }
+
+# --- LIBRERÍAS DE FIREBASE AÑADIDAS ---
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
+# La librería 'firebase-common-ktx' no suele ser necesaria si ya usas auth o firestore, pero la dejamos por si acaso.
+firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+# --- PLUGIN DE GOOGLE SERVICES AÑADIDO ---
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
