@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,69 +25,60 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.wherenow.ui.components.BottomNavigationBar
+import com.example.wherenow.data.model.EventRow
+import com.example.wherenow.data.repository.FirestoreEventRepository
 import com.example.wherenow.ui.components.AppHeader
+import com.example.wherenow.ui.components.BottomNavigationBar
 
-// ===== DATA =====
-data class Event(
-    val title: String,
-    val category: String,
-    val description: String,
-    val location: String,
-    val time: String,
-    val price: String,
-    val interested: Int,
-    val distance: String,
-    val mutualFriends: List<Friend>
-)
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 
-data class Friend(
-    val name: String,
-    val mutualFriends: Int
-)
 
 @Composable
 fun EventsScreen(navController: NavController) {
-    val context = LocalContext.current
-    var selectedEvent by remember { mutableStateOf<Event?>(null) }
+    val repo = remember { FirestoreEventRepository() }
 
-    val events = listOf(
-        Event(
-            title = "Food Truck Festival",
-            category = "Food",
-            description = "Over 20 gourmet food trucks featuring cuisines from around the world",
-            location = "Brooklyn Bridge Park",
-            time = "Tomorrow, 12:00 PM",
-            price = "$15 entry",
-            interested = 89,
-            distance = "1.2 miles away",
-            mutualFriends = listOf(Friend("David ", 5), Friend("Lisa ", 1))
-        ),
-        Event(
-            title = "Local Farmers Market",
-            category = "Food",
-            description = "Fresh produce and local delicacies from community farmers.",
-            location = "Central Park",
-            time = "Saturday, 9:00 AM",
-            price = "Free entry",
-            interested = 142,
-            distance = "0.8 miles away",
-            mutualFriends = listOf(Friend("Maria Lopez", 3))
-        ),
-        Event(
-            title = "Wine & Cheese Night",
-            category = "Food",
-            description = "Sample exclusive wines paired with gourmet cheeses.",
-            location = "The Wine Cellar",
-            time = "Friday, 7:00 PM",
-            price = "$25 entry",
-            interested = 56,
-            distance = "2.1 miles away",
-            mutualFriends = emptyList()
-        )
-    )
+    var events by remember { mutableStateOf<List<EventRow>>(emptyList()) }
+    var loading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var selectedEvent by remember { mutableStateOf<com.example.wherenow.data.model.EventRow?>(null) }
 
-    // Altura visual del header (para el padding del contenido)
+    val pendingId = navController
+        .previousBackStackEntry
+        ?.savedStateHandle
+        ?.get<String>("selectedEventId")
+
+    LaunchedEffect(pendingId) {
+        if (!pendingId.isNullOrEmpty()) {
+            try {
+                val repo = com.example.wherenow.data.repository.FirestoreEventRepository()
+
+                selectedEvent = repo.getById(pendingId)
+            } catch (e: Exception) {
+                error = e.message
+            } finally {
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.remove<String>("selectedEventId")
+            }
+        }
+    }
+
+    // Cargar eventos de Firestore
+    LaunchedEffect(Unit) {
+        try {
+            events = repo.getAll()
+            loading = false
+        } catch (e: Exception) {
+            error = e.message
+            loading = false
+        }
+    }
+
+
     val headerHeight = 172.dp
 
     Scaffold(
@@ -101,6 +91,7 @@ fun EventsScreen(navController: NavController) {
                 .padding(paddingValues)
                 .background(Color(0xFFF7F6FB))
         ) {
+            // HEADER
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -113,35 +104,225 @@ fun EventsScreen(navController: NavController) {
                 )
             }
 
-            // CONTENIDO
-            if (selectedEvent == null) {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(18.dp),
-                    contentPadding = PaddingValues(
-                        top = headerHeight + 16.dp,
-                        start = 16.dp, end = 16.dp, bottom = 16.dp
-                    )
-                ) {
-                    items(events) { event ->
-                        EventCard(event = event, onViewDetails = { selectedEvent = event })
-                    }
-                }
-            } else {
-                Column(
+            when {
+                loading -> Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = headerHeight)
-                        .padding(horizontal = 16.dp)
+                        .padding(top = headerHeight),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
+
+                error != null -> Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = headerHeight),
+                    contentAlignment = Alignment.Center
                 ) {
-                    EventDetails(event = selectedEvent!!, onBack = { selectedEvent = null })
+                    Text("Error: $error", color = Color.Red)
+                }
+
+                selectedEvent == null -> {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(18.dp),
+                        contentPadding = PaddingValues(
+                            top = headerHeight + 16.dp,
+                            start = 16.dp, end = 16.dp, bottom = 16.dp
+                        )
+                    ) {
+                        items(events) { event ->
+                            EventCard(
+                                event = event,
+                                onViewDetails = { selectedEvent = event }
+                            )
+                        }
+                    }
+                }
+
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = headerHeight)
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        EventDetails(
+                            event = selectedEvent!!,
+                            onBack = { selectedEvent = null }
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-/* ---------- UI helpers ---------- */
+// =====================================================
+// CARD
+// =====================================================
+private fun formatEventDateShort(date: java.util.Date?): String =
+    date?.let {
+        java.text.SimpleDateFormat("EEE, h:mm a", java.util.Locale.getDefault()).format(it)
+    } ?: "Date not available"
 
+@Composable
+fun EventCard(event: EventRow, onViewDetails: () -> Unit) {
+    val timeText = formatEventDateShort(event.startAt ?: event.createdAt)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 2.dp)
+            .shadow(elevation = 8.dp, shape = RoundedCornerShape(22.dp))
+            .background(
+                brush = Brush.verticalGradient(listOf(Color(0xFFA78BFA), Color(0xFFF0ABFC))),
+                shape = RoundedCornerShape(22.dp)
+            )
+            .padding(1.5.dp)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .clickable { onViewDetails() },        // toda la tarjeta abre detalles
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F6FB))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                // chip de estado
+                TagChip(event.status)
+
+                Spacer(Modifier.height(10.dp))
+
+                // SOLO nombre
+                Text(
+                    text = event.name,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
+                    color = Color(0xFF262626)
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                // SOLO hora y lugar
+                InfoRow(Icons.Filled.AccessTime, timeText)
+                Spacer(Modifier.height(6.dp))
+                InfoRow(Icons.Filled.Place, event.location)
+
+                Spacer(Modifier.height(14.dp))
+
+                // Botón "Ver detalles"
+                Button(
+                    onClick = onViewDetails,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E57C2)),
+                    shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
+                ) {
+                    Icon(Icons.Default.Info, contentDescription = null, tint = Color.White)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Ver detalles")
+                }
+            }
+        }
+    }
+}
+
+
+// =====================================================
+// DETALLES
+// =====================================================
+@Composable
+fun EventDetails(event: EventRow, onBack: () -> Unit) {
+    val context = LocalContext.current
+
+    // Se recuerda por evento (clave = event.eventId) para que al cambiar de evento se resetee.
+    var requestSent by remember(event.eventId) { mutableStateOf(false) }
+
+    val dateFull = event.startAt?.let {
+        java.text.SimpleDateFormat("EEEE, MMM d • h:mm a", java.util.Locale.getDefault()).format(it)
+    } ?: "No date"
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F4F8))
+    ) {
+        item {
+            TextButton(onClick = onBack, modifier = Modifier.padding(start = 16.dp, top = 8.dp)) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                Spacer(Modifier.width(6.dp))
+                Text("Back")
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    TagChip(event.status)
+                    Spacer(Modifier.height(10.dp))
+
+                    Text(event.name, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, color = Color(0xFF222222))
+                    Spacer(Modifier.height(6.dp))
+
+                    if (event.description.isNotBlank()) {
+                        Text(event.description, color = Color(0xFF6F6F6F))
+                        Spacer(Modifier.height(12.dp))
+                    }
+
+                    InfoRow(Icons.Filled.AccessTime, dateFull)
+                    Spacer(Modifier.height(6.dp))
+                    InfoRow(Icons.Filled.Place, event.location)
+                    Spacer(Modifier.height(6.dp))
+                    InfoRow(Icons.Filled.AttachMoney, "${event.interested} USD")
+                    Spacer(Modifier.height(6.dp))
+                    InfoRow(Icons.Filled.People, "${event.interested} interested")
+                    if (event.distanceText.isNotBlank()) {
+                        Spacer(Modifier.height(6.dp))
+                        InfoRow(Icons.Filled.LocationSearching, event.distanceText)
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Button(
+                        onClick = {
+                            if (!requestSent) {
+                                requestSent = true
+                                Toast.makeText(context, "Request submitted", Toast.LENGTH_SHORT).show()
+
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !requestSent,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (requestSent) Color(0xFFBDBDBD) else Color(0xFF7E57C2)
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(vertical = 12.dp)
+                    ) {
+                        Icon(Icons.Filled.EventAvailable, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text(if (requestSent) "Request Sent" else "Request Access to Event")
+                    }
+
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        if (requestSent) "Request submitted ✓" else "Event organizer will review your request",
+                        fontSize = 12.sp,
+                        color = if (requestSent) Color(0xFF2E7D32) else Color(0xFF8C8C8C)
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+// =====================================================
+// HELPERS
+// =====================================================
 @Composable
 private fun TagChip(text: String) {
     Surface(
@@ -165,192 +346,5 @@ private fun InfoRow(icon: ImageVector, label: String) {
         Icon(icon, contentDescription = null, tint = Color(0xFF8B8B8B), modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(6.dp))
         Text(label, fontSize = 14.sp, color = Color(0xFF4C4C4C))
-    }
-}
-
-// ===== CARD =====
-@Composable
-fun EventCard(event: Event, onViewDetails: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 2.dp)
-            .shadow(elevation = 8.dp, shape = RoundedCornerShape(22.dp), clip = false)
-            .background(
-                brush = Brush.verticalGradient(listOf(Color(0xFFA78BFA), Color(0xFFF0ABFC))),
-                shape = RoundedCornerShape(22.dp)
-            )
-            .padding(1.5.dp)
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
-                .clickable { onViewDetails() },
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F6FB)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                TagChip(event.category)
-                Spacer(Modifier.height(10.dp))
-                Text(event.title, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, color = Color(0xFF262626))
-                Spacer(Modifier.height(4.dp))
-                Text(event.description, color = Color(0xFF7C7C7C), fontSize = 13.sp, lineHeight = 18.sp)
-                Spacer(Modifier.height(12.dp))
-                InfoRow(Icons.Filled.Place, event.location)
-                Spacer(Modifier.height(6.dp))
-                InfoRow(Icons.Filled.AccessTime, event.time)
-                Spacer(Modifier.height(14.dp))
-                Button(
-                    onClick = onViewDetails,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E57C2)),
-                    shape = RoundedCornerShape(12.dp),
-                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF6246B5)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.Info, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
-                    }
-                    Spacer(Modifier.width(8.dp))
-                    Text("View Details", fontWeight = FontWeight.Medium)
-                }
-            }
-        }
-    }
-}
-
-// ===== DETAILS =====
-@Composable
-fun EventDetails(event: Event, onBack: () -> Unit) {
-    val context = LocalContext.current
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F4F8))
-            .padding(horizontal = 0.dp)
-    ) {
-        item {
-            Spacer(Modifier.height(8.dp))
-            TextButton(onClick = onBack, modifier = Modifier.padding(horizontal = 16.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                Spacer(Modifier.width(6.dp))
-                Text("Back")
-            }
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    TagChip(event.category)
-                    Spacer(Modifier.height(10.dp))
-                    Text(event.title, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, color = Color(0xFF222222))
-                    Spacer(Modifier.height(4.dp))
-                    Text(event.description, color = Color(0xFF6F6F6F))
-                    Spacer(Modifier.height(14.dp))
-
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            InfoRow(Icons.Filled.AccessTime, event.time)
-                            InfoRow(Icons.Filled.Place, event.location)
-                        }
-                        Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.AttachMoney, contentDescription = null, tint = Color(0xFF8B8B8B), modifier = Modifier.size(18.dp))
-                                Spacer(Modifier.width(4.dp))
-                                Text(event.price, fontWeight = FontWeight.SemiBold, color = Color(0xFF2E2E2E))
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.People, contentDescription = null, tint = Color(0xFF8B8B8B), modifier = Modifier.size(18.dp))
-                                Spacer(Modifier.width(4.dp))
-                                Text("${event.interested} interested", color = Color(0xFF2E2E2E))
-                            }
-                        }
-                    }
-
-                    Spacer(Modifier.height(16.dp))
-                    Text("People you may know", fontWeight = FontWeight.Medium, color = Color(0xFF2E2E2E))
-                    Spacer(Modifier.height(8.dp))
-
-                    event.mutualFriends.forEach { FriendRow(it) }
-
-                    Spacer(Modifier.height(16.dp))
-                    Button(
-                        onClick = {
-                            Toast.makeText(context, "Request sent to join event", Toast.LENGTH_SHORT).show()
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7E57C2)),
-                        shape = RoundedCornerShape(12.dp),
-                        contentPadding = PaddingValues(vertical = 12.dp)
-                    ) {
-                        Icon(Icons.Filled.EventAvailable, contentDescription = "Request")
-                        Spacer(Modifier.width(6.dp))
-                        Text("Request Access to Event", fontWeight = FontWeight.Medium)
-                    }
-
-                    Spacer(Modifier.height(6.dp))
-                    Text("Event organizer will review your request", fontSize = 12.sp, color = Color(0xFF8C8C8C))
-                }
-            }
-        }
-    }
-}
-
-// ===== FRIEND ROW =====
-@Composable
-fun FriendRow(friend: Friend) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F8FC)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFE0E0E0))
-                )
-                Spacer(Modifier.width(10.dp))
-                Column {
-                    Text(friend.name, fontWeight = FontWeight.SemiBold, color = Color(0xFF2E2E2E))
-                    Text("${friend.mutualFriends} mutual friends", fontSize = 12.sp, color = Color(0xFF8C8C8C))
-                }
-            }
-            OutlinedButton(
-                onClick = { /* futuro chat */ },
-                shape = RoundedCornerShape(10.dp),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Icon(Icons.Filled.Message, contentDescription = "Message", modifier = Modifier.size(16.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Message")
-            }
-        }
     }
 }

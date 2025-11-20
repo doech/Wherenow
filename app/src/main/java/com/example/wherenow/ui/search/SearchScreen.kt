@@ -21,6 +21,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.wherenow.ui.components.BottomNavigationBar
 import androidx.navigation.compose.rememberNavController
+import com.example.wherenow.data.model.SearchResult
+import com.example.wherenow.navigation.NavRoutes
 import com.example.wherenow.ui.components.AppHeader
 
 @Composable
@@ -116,10 +118,19 @@ fun SearchScreen(
                         results = searchResults,
                         onResultClick = { result ->
                             when (result.type) {
-                                "event" -> onNavigateToEvent(result.id)
-                                "circle" -> onNavigateToCircle(result.id)
-                                "user" -> onNavigateToProfile(result.id)
+                                "event" -> {
+                                    // Guardamos el id en el estado de navegación actual
+                                    navController.currentBackStackEntry
+                                        ?.savedStateHandle
+                                        ?.set("selectedEventId", result.id)
+
+
+                                    navController.navigate(NavRoutes.EVENTS)
+                                }
+                                "circle" -> { /* futuro */ }
+                                "user"   -> { /* futuro */ }
                             }
+
                         }
                     )
                 }

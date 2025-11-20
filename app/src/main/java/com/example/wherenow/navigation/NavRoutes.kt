@@ -7,4 +7,6 @@ object NavRoutes {
     const val HOME = "home"
     const val SEARCH = "search"
     const val EVENTS = "events"
+
+    const val CHAT   = "chat"
 }
