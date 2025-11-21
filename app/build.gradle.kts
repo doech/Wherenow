@@ -28,13 +28,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
     }
@@ -42,6 +45,8 @@ android {
 
 dependencies {
 
+    // Dependencias principales usando el catálogo de versiones (libs)
+    implementation("io.coil-kt:coil-compose:2.4.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -53,8 +58,12 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.foundation.layout)
     implementation(libs.androidx.compose.material.icons.extended)
+    // Nota: La siguiente dependencia 'libs.ui' podría ser redundante si ya usas 'libs.androidx.ui'.
+    // Si encuentras un error, prueba eliminando esta línea.
     implementation(libs.ui)
     implementation(libs.androidx.compose.ui.ui)
+
+    // Dependencias de Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -62,9 +71,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("androidx.compose.material:material-icons-extended")
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+
+    // Firebase Bill of Materials (BOM)
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+
+    // Dependencias de Firebase (sin especificar versión, gracias al BOM)
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // Las dependencias duplicadas que estaban aquí han sido eliminadas.
 }

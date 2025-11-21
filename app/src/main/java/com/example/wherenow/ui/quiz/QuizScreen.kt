@@ -31,12 +31,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.wherenow.R
 import com.example.wherenow.navigation.NavRoutes
+import com.example.wherenow.ui.categories.CategoryViewModel
+import com.example.wherenow.ui.auth.AuthViewModel
+
 
 // =========================
-// Datos
+// MODELO UI
 // =========================
+
 data class InterestCategory(
     val id: String,
     val title: String,
@@ -45,11 +50,24 @@ data class InterestCategory(
 )
 
 // =========================
-// Quiz
+// QUIZ SCREEN
 // =========================
 
 @Composable
-fun QuizScreen(navController: NavController) {
+fun QuizScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = viewModel(),
+    categoryViewModel: CategoryViewModel = viewModel()
+) {
+
+    val categories by categoryViewModel.categories.collectAsState()
+    val user = authViewModel.user.collectAsState().value
+    val userId = user?.id ?: ""
+
+    LaunchedEffect(Unit) {
+        categoryViewModel.loadCategories()
+    }
+
     var selectedInterests by remember { mutableStateOf(setOf<String>()) }
     var showConfirmation by remember { mutableStateOf(false) }
 
@@ -61,18 +79,18 @@ fun QuizScreen(navController: NavController) {
         return
     }
 
-    val interests = listOf(
-        InterestCategory("music",       stringResource(R.string.interest_music),       "music",       Color(0xFF9C27B0)),
-        InterestCategory("food",        stringResource(R.string.interest_food),        "food",        Color(0xFFFF9800)),
-        InterestCategory("arts",        stringResource(R.string.interest_arts),        "arts",        Color(0xFFE91E63)),
-        InterestCategory("gaming",      stringResource(R.string.interest_gaming),      "gaming",      Color(0xFF2196F3)),
-        InterestCategory("sports",      stringResource(R.string.interest_sports),      "sports",      Color(0xFF4CAF50)),
-        InterestCategory("learning",    stringResource(R.string.interest_learning),    "learning",    Color(0xFF673AB7)),
-        InterestCategory("social",      stringResource(R.string.interest_social),      "social",      Color(0xFF009688)),
-        InterestCategory("photography", stringResource(R.string.interest_photography), "photography", Color(0xFFFFC107)),
-        InterestCategory("business",    stringResource(R.string.interest_business),    "business",    Color(0xFF607D8B)),
-        InterestCategory("health",      stringResource(R.string.interest_health),      "health",      Color(0xFFF44336))
-    )
+    val interests = categories.map { cat ->
+        InterestCategory(
+            id = cat.id,
+            title = cat.name["es"] ?: cat.name["en"] ?: cat.id,
+            iconType = cat.icon,
+            color = try {
+                Color(android.graphics.Color.parseColor(cat.color))
+            } catch (e: Exception) {
+                Color(0xFF9C27B0)
+            }
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -83,6 +101,7 @@ fun QuizScreen(navController: NavController) {
                 )
             )
     ) {
+
         Card(
             modifier = Modifier
                 .fillMaxSize()
@@ -90,28 +109,43 @@ fun QuizScreen(navController: NavController) {
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
+
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
+                modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 InterestSelectionScreen(
                     interests = interests,
                     selectedInterests = selectedInterests,
                     onInterestToggle = { id ->
-                        selectedInterests = if (selectedInterests.contains(id)) selectedInterests - id else selectedInterests + id
+                        selectedInterests =
+                            if (selectedInterests.contains(id))
+                                selectedInterests - id
+                            else
+                                selectedInterests + id
                     },
                     onContinue = {
-                        showConfirmation = true
+                        if (userId.isNotEmpty()) {
+                            categoryViewModel.saveUserSelectedCategories(
+                                userId = userId,
+                                selectedIds = selectedInterests.toList()
+                            ) { ok ->
+                                if (ok) showConfirmation = true
+                            }
+                        }
                     },
                     onBack = { navController.popBackStack() }
                 )
             }
-            }
         }
     }
+}
 
+
+// =========================
+// SELECCIÓN DE CATEGORÍAS
+// =========================
 
 @Composable
 fun InterestSelectionScreen(
@@ -121,7 +155,9 @@ fun InterestSelectionScreen(
     onContinue: () -> Unit,
     onBack: () -> Unit
 ) {
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
         Text(
             text = stringResource(R.string.quiz_title),
             fontSize = 24.sp,
@@ -147,6 +183,7 @@ fun InterestSelectionScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.weight(1f)
         ) {
+
             items(interests) { interest ->
                 InterestCard(
                     interest = interest,
@@ -163,36 +200,28 @@ fun InterestSelectionScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(
-                onClick = onBack,
-                colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF718096))
-            ) {
-                CustomIcon(iconType = "arrow_back", color = Color(0xFF718096), size = 16.dp)
-                Spacer(Modifier.width(8.dp))
+
+            TextButton(onClick = onBack) {
                 Text(stringResource(R.string.back))
             }
 
             Button(
                 onClick = onContinue,
                 enabled = selectedInterests.size >= 3,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF9C27B0),
-                    disabledContainerColor = Color(0xFFE0E0E0)
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.height(48.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.continue_),
-                    color = Color.White,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(Modifier.width(8.dp))
-                CustomIcon(iconType = "arrow_forward", color = Color.White, size = 16.dp)
+                Text(text = stringResource(R.string.continue_), color = Color.White)
             }
         }
     }
 }
+
+
+// =========================
+// CARD
+// =========================
 
 @Composable
 fun InterestCard(
@@ -200,47 +229,45 @@ fun InterestCard(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
             .clickable { onClick() }
             .then(
-                if (isSelected) {
+                if (isSelected)
                     Modifier.border(2.dp, Color(0xFF9C27B0), RoundedCornerShape(16.dp))
-                } else {
-                    Modifier
-                }
+                else Modifier
             ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) Color(0xFFF3E5F5) else Color(0xFFF7FAFC)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
+
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize().padding(16.dp)
         ) {
             CustomIcon(interest.iconType, interest.color, 24.dp)
             Spacer(Modifier.height(8.dp))
             Text(
                 text = interest.title,
+                color = Color(0xFF2D3748),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF2D3748),
-                textAlign = TextAlign.Center,
-                lineHeight = 14.sp
+                textAlign = TextAlign.Center
             )
         }
     }
 }
 
+
 // =========================
-// Confirmation
+// CONFIRMACIÓN
 // =========================
 
 @Composable
@@ -250,10 +277,10 @@ fun ConfirmationScreen(
 ) {
     val interests = selectedInterests.ifEmpty {
         listOf(
-        "Health & Wellness",
-        "Photography",
-        "Social & Networking"
-    )
+            "Health & Wellness",
+            "Photography",
+            "Social & Networking"
+        )
     }
 
     Box(
@@ -379,9 +406,12 @@ fun InterestChip(label: String) {
     }
 }
 
+
 // =========================
-// Iconos dibujados (Canvas)
+// ICONOS DIBUJADOS
+// (SE QUEDAN IGUAL)
 // =========================
+
 @Composable
 fun CustomIcon(
     iconType: String,
@@ -400,13 +430,16 @@ fun CustomIcon(
             "social" -> drawSocialIcon(color)
             "photography" -> drawPhotographyIcon(color)
             "business" -> drawBusinessIcon(color)
-            "health" -> drawHealthIcon(color)
-            "heart" -> drawHealthIcon(color)
+            "health", "heart" -> drawHealthIcon(color)
             "arrow_back" -> drawArrowBackIcon(color)
             "arrow_forward" -> drawArrowForwardIcon(color)
         }
     }
 }
+
+// (LOS DRAWINGS QUEDAN IGUAL Y YA NO LOS REPITO PARA AHORRAR ESPACIO)
+// PEGALOS TAL CUAL LOS TENÍAS
+
 
 fun DrawScope.drawMusicIcon(color: Color) {
     drawCircle(color = color, radius = size.width * 0.15f, center = Offset(size.width * 0.3f, size.height * 0.7f))

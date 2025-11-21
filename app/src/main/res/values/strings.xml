@@ -19,6 +19,7 @@
     <string name="welcome_back">Welcome Back!</string>
     <string name="signin_subtitle">Sign in to discover amazing events near you</string>
     <string name="enter_email">Enter your email</string>
+    <string name="enter_username">Enter your username</string>
     <string name="enter_password">Enter your password</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="join_adventure">Join the adventure</string>
@@ -68,6 +69,52 @@
     <string name="interest_photography">Photography</string>
     <string name="interest_business">Business &amp; Career</string>
     <string name="interest_health">Health &amp; Wellness</string>
+
+    <!-- Search Screen -->
+
+    <string name="search_empty_title">Start searching</string>
+    <string name="search_empty_subtitle">Find events, circles, and people</string>
+    <string name="search_no_results">No results found</string>
+
+    <string name="search_placeholder">Search events, circles, or people...</string>
+
+    <!-- Search filters -->
+    <string name="search_filter_all">All</string>
+    <string name="search_filter_events">Events</string>
+    <string name="search_filter_circles">Circles</string>
+    <string name="search_filter_people">People</string>
+
+    <!-- Result type labels -->
+    <string name="search_type_event">Event</string>
+    <string name="search_type_circle">Circle</string>
+    <string name="search_type_user">User</string>
+
+    <!-- User details -->
+    <string name="user_details_back_cd">Back</string>
+    <string name="user_details_photo_cd">User photo</string>
+    <string name="user_details_unknown_user">Unknown user</string>
+
+    <string name="user_details_section_bio">Bio</string>
+    <string name="user_details_section_email">Email</string>
+    <string name="user_details_section_city">City</string>
+    <string name="user_details_section_language">Language</string>
+    <string name="user_details_section_status">Status</string>
+
+    <!-- Create Circle -->
+    <string name="create_circle_title">Create new circle</string>
+    <string name="create_circle_name_label">Circle name</string>
+    <string name="create_circle_description_label">Description</string>
+    <string name="create_circle_category_label">Category</string>
+    <string name="create_circle_category_placeholder">Choose a category</string>
+
+    <string name="create_circle_success">Circle created successfully!</string>
+    <string name="create_circle_error_default">Error creating circle</string>
+
+    <string name="create_circle_button">Create circle</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="category_unnamed">Unnamed</string>
+
 
 
 </resources>
