@@ -27,6 +27,10 @@ import com.example.wherenow.ui.auth.AuthViewModel
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.imePadding
+
 
 
 @Composable
@@ -40,6 +44,7 @@ fun AuthScreen(navController: NavController) {
     val authViewModel: AuthViewModel = viewModel()
     var errorMsg by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
     Box(
         modifier = Modifier
@@ -57,7 +62,10 @@ fun AuthScreen(navController: NavController) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .imePadding()
         ) {
             Spacer(modifier = Modifier.height(60.dp))
 

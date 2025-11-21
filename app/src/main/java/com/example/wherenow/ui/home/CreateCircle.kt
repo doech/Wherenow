@@ -16,6 +16,9 @@ import com.example.wherenow.data.model.CategoryRow
 import com.example.wherenow.ui.auth.AuthViewModel
 import com.example.wherenow.ui.circles.CircleViewModel
 import kotlinx.coroutines.delay
+import androidx.compose.ui.res.stringResource
+import com.example.wherenow.R
+
 
 @Composable
 fun CreateCircle(
@@ -43,10 +46,9 @@ fun CreateCircle(
 
     var successMessage by remember { mutableStateOf<String?>(null) }
 
-    // ⭐ bandera para cerrar después de éxito
+
     var closeAfterSuccess by remember { mutableStateOf(false) }
 
-    // ⭐ ESTE LaunchedEffect sí es válido
     LaunchedEffect(closeAfterSuccess) {
         if (closeAfterSuccess) {
             delay(1200)
@@ -61,7 +63,7 @@ fun CreateCircle(
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = MaterialTheme.shapes.large,
-            color = Color(0xFFF3E5F5),
+            color = Color.White,
             tonalElevation = 4.dp,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -69,7 +71,7 @@ fun CreateCircle(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Create new circle", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.create_circle_title), style = MaterialTheme.typography.titleLarge)
 
                 Spacer(Modifier.height(20.dp))
 
@@ -85,14 +87,14 @@ fun CreateCircle(
                 OutlinedTextField(
                     value = desc,
                     onValueChange = { desc = it },
-                    label = { Text("Description") },
+                    label = { Text(stringResource(R.string.create_circle_name_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                Text("Category", style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.create_circle_category_label), style = MaterialTheme.typography.titleSmall)
 
                 Spacer(Modifier.height(6.dp))
 
@@ -174,13 +176,13 @@ fun CreateCircle(
                         }
                     }
                 ) {
-                    Text("Create Circle")
+                    Text(stringResource(R.string.create_circle_button))
                 }
 
                 Spacer(Modifier.height(8.dp))
 
                 TextButton(onClick = onDismiss) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         }

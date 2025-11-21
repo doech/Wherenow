@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -26,71 +25,70 @@ import com.example.wherenow.ui.auth.AuthViewModel
 
 @Composable
 fun AppHeader(
-    userName: String = "Usuario",   // NO los elimino porque NO quieres cambiar nada del componente
-    handle: String = "@Usuario123", // pero ya NO se usan, quedan ignorados
+    userName: String = "Usuario",
+    handle: String = "@Usuario123",
     onProfileClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {}
 ) {
-    // ⬇️ NUEVO: obtener AuthViewModel sin pasarlo como parámetro
     val authViewModel: AuthViewModel = viewModel()
     val userState = authViewModel.user.collectAsState()
 
-    // ⬇️ NUEVO: valores reales del usuario autenticado
     val actualName = userState.value?.name ?: userName
     val actualHandle = "@${userState.value?.username ?: handle.removePrefix("@")}"
 
-    // Gradiente SOLO arriba
     val gradient = Brush.verticalGradient(
         colors = listOf(Color(0xFF9C8FFF), Color(0xFFF871FF)),
         startY = 0f,
         endY = 600f
     )
 
+    // Fondo claro detrás del header (por si las esquinas son transparentes)
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(112.dp)
-            .background(
-                brush = gradient,
-                shape = RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp)
-            )
-            .padding(horizontal = 16.dp, vertical = 18.dp)
+            .background(Color(0xFFF7F6FB)) // o Color.White
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp))
+                .background(brush = gradient)
+                .padding(horizontal = 16.dp, vertical = 18.dp)
         ) {
-
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFE0E0E0))
-                    .clickable { onProfileClick() }
-            )
-
-            Column {
-                Text(
-                    actualName,
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    actualHandle,
-                    color = Color(0xFFEDE7F6),
-                    fontSize = 13.sp
-                )
-            }
-
-            IconButton(
-                onClick = onLogoutClick
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Cerrar sesión",
-                    tint = Color.White
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFE0E0E0))
+                        .clickable { onProfileClick() }
                 )
+
+                Column {
+                    Text(
+                        actualName,
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        actualHandle,
+                        color = Color(0xFFEDE7F6),
+                        fontSize = 13.sp
+                    )
+                }
+
+                IconButton(onClick = onLogoutClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = "Cerrar sesión",
+                        tint = Color.White
+                    )
+                }
             }
         }
     }

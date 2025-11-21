@@ -72,8 +72,12 @@ fun HomeScreen(navController: NavController, searchViewModel: SearchViewModel = 
 
     val headerHeight = 112.dp
 
-    Box(modifier = Modifier.fillMaxSize()) {
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF7F6FB))
+    ) {
+        // HEADER
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,14 +86,15 @@ fun HomeScreen(navController: NavController, searchViewModel: SearchViewModel = 
             AppHeader(
                 userName = "Usuario",
                 handle = "@Usuario123",
-                onProfileClick = { navController.navigate("Pega_aquí_tu_ruta_de_perfil") },
-                onLogoutClick = { authViewModel.logout()
+                onLogoutClick = {
+                    authViewModel.logout()
                     navController.navigate(NavRoutes.AUTH) {
-                        popUpTo(0)  // Limpia el backstack
+                        popUpTo(0)
                     }
                 }
             )
         }
+
 
         Column(
             modifier = Modifier

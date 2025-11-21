@@ -38,6 +38,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.draw.clip
 import com.example.wherenow.ui.auth.AuthViewModel
+import com.example.wherenow.R
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun SearchScreen(
@@ -114,8 +116,6 @@ fun SearchScreen(
                     .height(headerHeight)
             ) {
                 AppHeader(
-                    userName = "Usuario",
-                    handle = "@Usuario123",
                     onProfileClick = {},
                     onLogoutClick = { authViewModel.logout()
                         navController.navigate(NavRoutes.AUTH) {
@@ -203,9 +203,9 @@ fun EmptySearchState() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFFB0B0B0), modifier = Modifier.size(64.dp))
             Spacer(modifier = Modifier.height(12.dp))
-            Text("Start Searching", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.search_empty_title), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text("Find events, circles, and people", fontSize = 13.sp, color = Color.Gray)
+            Text(stringResource(R.string.search_empty_subtitle), fontSize = 13.sp, color = Color.Gray)
         }
     }
 }
@@ -216,7 +216,7 @@ fun NoResultsState() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("No results found", color = Color.Gray)
+        Text(stringResource(R.string.search_no_results), color = Color.Gray)
     }
 }
 
@@ -239,7 +239,7 @@ fun SearchCard(
                 value = query,
                 onValueChange = onQueryChange,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Search events, circles, or people...") },
+                placeholder = { Text(stringResource(R.string.search_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 shape = RoundedCornerShape(12.dp)
             )
@@ -250,11 +250,23 @@ fun SearchCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                val filterLabelMap = mapOf(
+                    "All" to R.string.search_filter_all,
+                    "Events" to R.string.search_filter_events,
+                    "Circles" to R.string.search_filter_circles,
+                    "People" to R.string.search_filter_people
+                )
+
+
                 listOf("All", "Events", "Circles", "People").forEach { filter ->
                     FilterChip(
                         selected = selectedFilter == filter,
                         onClick = { onFilterChange(filter) },
-                        label = { Text(filter) },
+                        label = { Text(
+                            text = stringResource(
+                                id = filterLabelMap[filter] ?: R.string.search_filter_all
+                            )
+                        ) },
                         shape = RoundedCornerShape(24.dp)
                     )
                 }
@@ -280,7 +292,8 @@ fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -292,13 +305,22 @@ fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
                 "user" -> Icons.Default.Person
                 else -> Icons.Default.Search
             }
+
+            val typeLabelRes = when (result.type) {
+                "event" -> R.string.search_type_event
+                "circle" -> R.string.search_type_circle
+                "user" -> R.string.search_type_user
+                else -> R.string.search_type_event
+            }
+
+
             Icon(icon, contentDescription = null, tint = Color(0xFF9C27B0), modifier = Modifier.size(32.dp))
 
             Spacer(modifier = Modifier.width(16.dp))
 
             Column {
-                Text(result.name, fontSize = 16.sp, fontWeight = FontWeight.Medium)
-                Text(result.type.replaceFirstChar { it.uppercase() }, fontSize = 13.sp, color = Color.Gray)
+                Text(result.name, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                Text(stringResource(typeLabelRes), fontSize = 13.sp, color = Color.Gray)
             }
         }
     }
@@ -324,10 +346,11 @@ fun UserDetails(
             ) {
                 Icon(
                     Icons.Filled.ArrowBackIosNew,
-                    contentDescription = "Back"
+                    contentDescription = stringResource(R.string.user_details_back_cd)
+
                 )
                 Spacer(Modifier.width(6.dp))
-                Text("Back")
+                Text(stringResource(R.string.back))
             }
 
             // FOTO
@@ -345,7 +368,8 @@ fun UserDetails(
                         .clip(CircleShape)
                         .background(Color(0xFFE0E0E0)),
                     contentScale = ContentScale.Crop,
-                    contentDescription = "User photo"
+                    contentDescription = stringResource(R.string.user_details_photo_cd)
+
                 )
             }
 
@@ -361,7 +385,9 @@ fun UserDetails(
 
                     // NAME
                     Text(
-                        text = user.name.ifBlank { "Unknown User" },
+                        text = user.name.ifBlank {
+                            stringResource(R.string.user_details_unknown_user)
+                        },
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 24.sp,
                         color = Color(0xFF222222)
@@ -378,7 +404,9 @@ fun UserDetails(
 
                     // BIO
                     if (user.bio.isNotBlank()) {
-                        SectionLabel("Bio")
+                        SectionLabel(
+                            text = stringResource(R.string.user_details_section_bio)
+                        )
                         Text(
                             text = user.bio,
                             fontSize = 14.sp,
@@ -389,25 +417,33 @@ fun UserDetails(
 
                     // EMAIL
                     if (user.email.isNotBlank()) {
-                        SectionLabel("Email")
+                        SectionLabel(
+                            text = stringResource(R.string.user_details_section_email)
+                        )
                         Text(user.email, fontSize = 14.sp, color = Color(0xFF333333))
                         Spacer(Modifier.height(12.dp))
                     }
 
                     // CITY
                     if (user.city.isNotBlank()) {
-                        SectionLabel("City")
+                        SectionLabel(
+                            text = stringResource(R.string.user_details_section_city)
+                        )
                         Text(user.city, fontSize = 14.sp, color = Color(0xFF333333))
                         Spacer(Modifier.height(12.dp))
                     }
 
                     // LANGUAGE
-                    SectionLabel("Language")
+                    SectionLabel(
+                        text = stringResource(R.string.user_details_section_language)
+                    )
                     Text(user.language.uppercase(), fontSize = 14.sp, color = Color(0xFF333333))
                     Spacer(Modifier.height(12.dp))
 
                     // STATUS
-                    SectionLabel("Status")
+                    SectionLabel(
+                        text = stringResource(R.string.user_details_section_status)
+                    )
                     Text(user.status, fontSize = 14.sp, color = Color(0xFF333333))
                 }
             }
