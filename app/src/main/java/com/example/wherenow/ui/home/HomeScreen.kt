@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,58 +30,38 @@ import android.net.Uri
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.wherenow.navigation.NavRoutes
-import com.example.wherenow.ui.auth.AuthViewModel
-import androidx.compose.runtime.collectAsState
-
-data class Circle(
-    val name: String,
-    val description: String,
-    val members: Int,
-    val timeAgo: String,
-    val lastMessage: String,
-    val isPublic: Boolean,
-    val color: Color
-)
-
+import com.example.wherenow.data.model.CircleRow
+import com.example.wherenow.ui.search.SearchViewModel
+import java.util.Date
+import java.util.concurrent.TimeUnit
 
 @Composable
-fun HomeScreen(navController: NavController) {
-    val mockCircles = remember {
-        listOf(
-            Circle("Music Lovers Network","Discussing concerts and music",24,"2m ago","Anyone going to the jazz festival?",true, Color(0xFF9C27B0)),
-            Circle("Foodie Adventures","Private group for food events",8,"1h ago","Found an amazing new...",false, Color(0xFFFF5722)),
-            Circle("Art Gallery Walks","Weekly art gallery visits",15,"3h ago","Next gallery walk is this Satur...",true, Color(0xFFE91E63)),
-            Circle("Tech Meetup Sessions","Private tech networking group",12,"1d ago","Great presentation at...",false, Color(0xFF2196F3))
-        )
-    }
+fun HomeScreen(navController: NavController, searchViewModel: SearchViewModel = viewModel()) {
 
-    val authViewModel: AuthViewModel = viewModel()
-    val currentUser by authViewModel.user.collectAsState()
+    val circles by searchViewModel.circles.collectAsState()
+
+    LaunchedEffect(Unit) {
+        searchViewModel.loadData()
+    }
 
     var showDialog by remember { mutableStateOf(false) }
     var showEventAcceptedPopup by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) { showEventAcceptedPopup = true }
+    //LaunchedEffect(Unit) { showEventAcceptedPopup = true }
 
     val headerHeight = 172.dp
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Header con gradiente (AppHeader)
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(headerHeight)
         ) {
             AppHeader(
-                userName = currentUser?.name ?: "Usuario",
-                handle = "@${currentUser?.username ?: "usuario"}",
-                onProfileClick = { navController.navigate("profile") },
-                onLogoutClick = {
-                    authViewModel.logout()
-                    navController.navigate(NavRoutes.AUTH) {
-                        popUpTo(0)
-                    }
-                }
+                userName = "Usuario",
+                handle = "@Usuario123",
+                onProfileClick = { navController.navigate("Pega_aquí_tu_ruta_de_perfil") }
             )
         }
 
@@ -110,11 +91,11 @@ fun HomeScreen(navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                items(mockCircles) { circle ->
+                items(circles) { circle ->
                     CircleCard(circle) {
                         val encodedName = Uri.encode(circle.name)
-                        val members = circle.members
-                        val colorArgb = circle.color.toArgb()
+                        val members = circle.membersCount
+                        val colorArgb = Color(0xFF9C27B0).toArgb()
 
                         navController.navigate("${NavRoutes.CHAT}/$encodedName/$members/$colorArgb")
                     }
@@ -145,9 +126,21 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
-
 @Composable
-fun CircleCard(circle: Circle, onClick: () -> Unit) {
+fun CircleCard(circle: CircleRow, onClick: () -> Unit) {
+
+    val color = Color(0xFF9C27B0)
+
+    val timeAgo = circle.lastActivity?.let { date ->
+        val diff = Date().time - date.time
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
+        when {
+            minutes < 60 -> "${minutes}m ago"
+            minutes < 1440 -> "${minutes / 60}h ago"
+            else -> "${minutes / 1440}d ago"
+        }
+    } ?: ""
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -161,7 +154,7 @@ fun CircleCard(circle: Circle, onClick: () -> Unit) {
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(circle.color)
+                        .background(color)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -182,22 +175,22 @@ fun CircleCard(circle: Circle, onClick: () -> Unit) {
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (circle.isPublic) "🔓 Public" else "🔒 Private",
+                            text = if (circle.visibility == "public") "🔓 Public" else "🔒 Private",
                             fontSize = 12.sp,
-                            color = if (circle.isPublic) Color(0xFF9C27B0) else Color.Gray
+                            color = if (circle.visibility == "public") Color(0xFF9C27B0) else Color.Gray
                         )
                     }
                 }
             }
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "${circle.members} members  •  ${circle.timeAgo}",
+                text = "${circle.membersCount} members  •  $timeAgo",
                 color = Color.Gray,
                 fontSize = 12.sp
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = circle.lastMessage,
+                text = circle.description,
                 fontSize = 13.sp,
                 color = Color.Black,
                 maxLines = 1,

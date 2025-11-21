@@ -14,43 +14,77 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.wherenow.ui.components.BottomNavigationBar
-import androidx.navigation.compose.rememberNavController
-import com.example.wherenow.data.model.SearchResult
-import com.example.wherenow.navigation.NavRoutes
 import com.example.wherenow.ui.components.AppHeader
+import com.example.wherenow.navigation.NavRoutes
+import com.example.wherenow.data.model.SearchResult
 
 @Composable
 fun SearchScreen(
     navController: NavController,
-    viewModel: SearchViewModel = viewModel(),
-    onNavigateToEvent: (String) -> Unit = {},
-    onNavigateToCircle: (String) -> Unit = {},
-    onNavigateToProfile: (String) -> Unit = {}
+    viewModel: SearchViewModel = viewModel()
 ) {
-    val query by viewModel.query.collectAsState()
-    val selectedFilter by viewModel.selectedFilter.collectAsState()
-    val searchResults by viewModel.searchResults.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    // carga inicial
+    LaunchedEffect(Unit) { viewModel.loadData() }
+
+    val users by viewModel.users.collectAsState()
+    val events by viewModel.events.collectAsState()
+    val circles by viewModel.circles.collectAsState()
+
+    // estado local (ANTES estaba en el ViewModel)
+    var query by remember { mutableStateOf("") }
+    var selectedFilter by remember { mutableStateOf("All") }
+    var isLoading by remember { mutableStateOf(true) }
+
+    // simula loading inicial
+    LaunchedEffect(users, events, circles) {
+        if (users.isNotEmpty() || events.isNotEmpty() || circles.isNotEmpty()) {
+            isLoading = false
+        }
+    }
+
+    // construir lista combinada + filtrar
+    val searchResults = remember(query, selectedFilter, users, events, circles) {
+        val all = mutableListOf<SearchResult>()
+
+        all += users.map {
+            SearchResult(id = it.id, name = it.name, type = "user")
+        }
+        all += events.map {
+            SearchResult(id = it.eventId, name = it.name, type = "event")
+        }
+        all += circles.map {
+            SearchResult(id = it.id, name = it.name, type = "circle")
+        }
+
+        // filtro de tipo
+        val filtered = when (selectedFilter) {
+            "Events" -> all.filter { it.type == "event" }
+            "Circles" -> all.filter { it.type == "circle" }
+            "People" -> all.filter { it.type == "user" }
+            else -> all
+        }
+
+        // filtro por texto
+        filtered.filter { it.name.contains(query, ignoreCase = true) }
+    }
 
     val headerHeight = 172.dp
 
     Scaffold(
-        containerColor = Color(0xFFF7F6FB), // fondo claro como en Events
+        containerColor = Color(0xFFF7F6FB),
         bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color(0xFFF7F6FB))
         ) {
-            // Header reutilizable (gradiente SOLO arriba)
+            // header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -59,22 +93,20 @@ fun SearchScreen(
                 AppHeader(
                     userName = "Usuario",
                     handle = "@Usuario123",
-                    onProfileClick = { /* navController.navigate("profile") si quieres */ }
+                    onProfileClick = {}
                 )
             }
 
-            // Contenido bajo el header
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = headerHeight + 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .padding(top = headerHeight + 16.dp, start = 16.dp, end = 16.dp)
             ) {
-                // Tarjeta de búsqueda (estilo tarjeta blanca con bordes redondeados)
                 SearchCard(
                     query = query,
                     selectedFilter = selectedFilter,
-                    onQueryChange = { viewModel.updateQuery(it) },
-                    onFilterChange = { viewModel.updateFilter(it) },
+                    onQueryChange = { query = it },
+                    onFilterChange = { selectedFilter = it },
                     hasResults = searchResults.isNotEmpty()
                 )
 
@@ -86,51 +118,18 @@ fun SearchScreen(
                         contentAlignment = Alignment.Center
                     ) { CircularProgressIndicator() }
 
-                    searchResults.isEmpty() && query.isBlank() -> Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = null,
-                                tint = Color(0xFFB0B0B0),
-                                modifier = Modifier.size(64.dp)
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text(
-                                text = "Start Searching",
-                                color = Color(0xFF3F3F3F),
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Find events, circles, and people that match your interests",
-                                color = Color(0xFF7A7A7A),
-                                fontSize = 13.sp
-                            )
-                        }
-                    }
+                    searchResults.isEmpty() && query.isBlank() -> EmptySearchState()
+
+                    searchResults.isEmpty() -> NoResultsState()
 
                     else -> SearchResultsList(
                         results = searchResults,
                         onResultClick = { result ->
                             when (result.type) {
-                                "event" -> {
-                                    // Guardamos el id en el estado de navegación actual
-                                    navController.currentBackStackEntry
-                                        ?.savedStateHandle
-                                        ?.set("selectedEventId", result.id)
-
-
-                                    navController.navigate(NavRoutes.EVENTS)
-                                }
-                                "circle" -> { /* futuro */ }
-                                "user"   -> { /* futuro */ }
+                                "event" -> navController.navigate(NavRoutes.EVENTS)
+                                "circle" -> navController.navigate(NavRoutes.HOME)
+                                "user" -> navController.navigate(NavRoutes.HOME)
                             }
-
                         }
                     )
                 }
@@ -139,6 +138,31 @@ fun SearchScreen(
     }
 }
 
+@Composable
+fun EmptySearchState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFFB0B0B0), modifier = Modifier.size(64.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+            Text("Start Searching", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Find events, circles, and people", fontSize = 13.sp, color = Color.Gray)
+        }
+    }
+}
+
+@Composable
+fun NoResultsState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("No results found", color = Color.Gray)
+    }
+}
 
 @Composable
 fun SearchCard(
@@ -161,13 +185,7 @@ fun SearchCard(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("Search events, circles, or people...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF7E57C2),
-                    unfocusedBorderColor = Color(0xFFE3E3E3),
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                )
+                shape = RoundedCornerShape(12.dp)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -181,13 +199,7 @@ fun SearchCard(
                         selected = selectedFilter == filter,
                         onClick = { onFilterChange(filter) },
                         label = { Text(filter) },
-                        shape = RoundedCornerShape(24.dp),
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Color(0xFF7E57C2),
-                            selectedLabelColor = Color.White,
-                            containerColor = Color(0xFFF4F4F6),
-                            labelColor = Color(0xFF3F3F3F)
-                        )
+                        shape = RoundedCornerShape(24.dp)
                     )
                 }
             }
@@ -198,13 +210,10 @@ fun SearchCard(
 @Composable
 fun SearchResultsList(results: List<SearchResult>, onResultClick: (SearchResult) -> Unit) {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(results) { result ->
-            SearchResultItem(result = result, onClick = { onResultClick(result) })
+            SearchResultItem(result, onClick = { onResultClick(result) })
         }
     }
 }
@@ -214,14 +223,11 @@ fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             val icon = when (result.type) {
@@ -230,38 +236,14 @@ fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
                 "user" -> Icons.Default.Person
                 else -> Icons.Default.Search
             }
-            Icon(
-                imageVector = icon,
-                contentDescription = result.type,
-                tint = Color(0xFF9C27B0),
-                modifier = Modifier.size(32.dp)
-            )
+            Icon(icon, contentDescription = null, tint = Color(0xFF9C27B0), modifier = Modifier.size(32.dp))
+
             Spacer(modifier = Modifier.width(16.dp))
+
             Column {
-                Text(
-                    text = result.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = when (result.type) {
-                        "event" -> "Event"
-                        "circle" -> "Circle"
-                        "user" -> "Person"
-                        else -> ""
-                    },
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
+                Text(result.name, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text(result.type.replaceFirstChar { it.uppercase() }, fontSize = 13.sp, color = Color.Gray)
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSearchScreen() {
-    val navController = rememberNavController()
-    MaterialTheme { SearchScreen(navController = navController) }
 }
