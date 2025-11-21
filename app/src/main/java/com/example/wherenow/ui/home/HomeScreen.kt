@@ -135,7 +135,6 @@ fun HomeScreen(navController: NavController, searchViewModel: SearchViewModel = 
         if (showDialog) {
             CreateCircle(
                 onDismiss = { showDialog = false },
-                onCreate = { _, _, _ -> showDialog = false }
             )
         }
 

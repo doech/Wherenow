@@ -1,104 +1,74 @@
 package com.example.wherenow.util
 
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Date
 
 object FirestoreSeeder {
 
     private val db = FirebaseFirestore.getInstance()
 
-    private val categories = listOf(
+    // ============================================================
+    // ===============      E V E N T S   (3)      =================
+    // ============================================================
+
+    private val events = listOf(
+
+        // ---------- EVENTO 1 ----------
         mapOf(
-            "id" to "music",
-            "icon" to "music",
-            "color" to "#A855F7",
-            "status" to "active",
-            "name" to mapOf("es" to "Música", "en" to "Music")
+            "eventId" to "EVT001",
+            "name" to "Food Truck Festival",
+            "description" to "Over 20 gourmet food trucks featuring cuisines from around the world.",
+            "location" to "Brooklyn Bridge Park",
+            "distanceText" to "1.2 miles away",
+            "priceText" to "15",
+            "interested" to 89,
+            "ownerId" to "FcJGCSIf6KfsknTYDFBeckZgD4D2",
+            "createdAt" to Date(),
+            "startAt" to Date(System.currentTimeMillis() + 86400000L * 10), // +10 días
+            "status" to "active"
         ),
+
+        // ---------- EVENTO 2 ----------
         mapOf(
-            "id" to "parties",
-            "icon" to "social",
-            "color" to "#F93457",
-            "status" to "active",
-            "name" to mapOf("es" to "Fiestas", "en" to "Parties")
+            "eventId" to "EVT002",
+            "name" to "Neon Night Party",
+            "description" to "A glowing neon-themed electronic music party until sunrise.",
+            "location" to "Warehouse District 14",
+            "distanceText" to "3.5 miles away",
+            "priceText" to "25",
+            "interested" to 142,
+            "ownerId" to "Ze51cOn1QQhpkggEKNtu5ILjmB1F3",
+            "createdAt" to Date(),
+            "startAt" to Date(System.currentTimeMillis() + 86400000L * 3), // +3 días
+            "status" to "active"
         ),
+
+        // ---------- EVENTO 3 ----------
         mapOf(
-            "id" to "sports",
-            "icon" to "sports",
-            "color" to "#3B82F6",
-            "status" to "active",
-            "name" to mapOf("es" to "Deportes", "en" to "Sports")
-        ),
-        mapOf(
-            "id" to "nightlife",
-            "icon" to "social",
-            "color" to "#FF4081",
-            "status" to "active",
-            "name" to mapOf("es" to "Vida Nocturna", "en" to "Nightlife")
-        ),
-        mapOf(
-            "id" to "concerts",
-            "icon" to "music",
-            "color" to "#7C4DFF",
-            "status" to "active",
-            "name" to mapOf("es" to "Conciertos", "en" to "Concerts")
-        ),
-        mapOf(
-            "id" to "workshops",
-            "icon" to "learning",
-            "color" to "#4CAF50",
-            "status" to "active",
-            "name" to mapOf("es" to "Talleres", "en" to "Workshops")
-        ),
-        mapOf(
-            "id" to "bar_meetups",
-            "icon" to "social",
-            "color" to "#FF9800",
-            "status" to "active",
-            "name" to mapOf("es" to "Reuniones en Bares", "en" to "Bar Meetups")
-        ),
-        mapOf(
-            "id" to "food_experiences",
-            "icon" to "food",
-            "color" to "#FF5722",
-            "status" to "active",
-            "name" to mapOf("es" to "Experiencias Gastronómicas", "en" to "Food Experiences")
-        ),
-        mapOf(
-            "id" to "art_exhibitions",
-            "icon" to "arts",
-            "color" to "#9C27B0",
-            "status" to "active",
-            "name" to mapOf("es" to "Exhibiciones de Arte", "en" to "Art Exhibitions")
-        ),
-        mapOf(
-            "id" to "volunteering",
-            "icon" to "health",
-            "color" to "#009688",
-            "status" to "active",
-            "name" to mapOf("es" to "Voluntariado", "en" to "Volunteering")
-        ),
-        mapOf(
-            "id" to "gaming_events",
-            "icon" to "gaming",
-            "color" to "#3F51B5",
-            "status" to "active",
-            "name" to mapOf("es" to "Eventos Gamer", "en" to "Gaming Events")
-        ),
-        mapOf(
-            "id" to "coffee_parties",
-            "icon" to "food",
-            "color" to "#A1887F",
-            "status" to "active",
-            "name" to mapOf("es" to "Cafecitos", "en" to "Coffee Parties")
+            "eventId" to "EVT003",
+            "name" to "Community Soccer Match",
+            "description" to "Friendly soccer match open to all ages and skill levels.",
+            "location" to "Central Park Field 3",
+            "distanceText" to "0.8 miles away",
+            "priceText" to "Free",
+            "interested" to 52,
+            "ownerId" to "RLf0KkG0SqOcD2jjH5UFewY31cw1",
+            "createdAt" to Date(),
+            "startAt" to Date(System.currentTimeMillis() + 86400000L * 5), // +5 días
+            "status" to "active"
         )
     )
 
-    fun seedCategories(onDone: (Boolean) -> Unit) {
+    // ============================================================
+    // ===============    Seed de Eventos       ====================
+    // ============================================================
+
+    fun seedEvents(onDone: (Boolean) -> Unit) {
         val batch = db.batch()
 
-        categories.forEach { cat ->
-            val doc = db.collection("categories").document(cat["id"] as String)
-            batch.set(doc, cat)
+        events.forEach { event ->
+            val doc = db.collection("events").document(event["eventId"] as String)
+            batch.set(doc, event)
         }
 
         batch.commit()
