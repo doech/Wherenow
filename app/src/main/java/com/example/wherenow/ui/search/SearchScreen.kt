@@ -37,6 +37,7 @@ import coil.compose.AsyncImage
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.draw.clip
+import com.example.wherenow.ui.auth.AuthViewModel
 
 @Composable
 fun SearchScreen(
@@ -45,7 +46,7 @@ fun SearchScreen(
 ) {
     // carga inicial
     LaunchedEffect(Unit) { viewModel.loadData() }
-
+    val authViewModel: AuthViewModel = viewModel()
     val users by viewModel.users.collectAsState()
     val events by viewModel.events.collectAsState()
     val circles by viewModel.circles.collectAsState()
@@ -115,7 +116,12 @@ fun SearchScreen(
                 AppHeader(
                     userName = "Usuario",
                     handle = "@Usuario123",
-                    onProfileClick = {}
+                    onProfileClick = {},
+                    onLogoutClick = { authViewModel.logout()
+                        navController.navigate(NavRoutes.AUTH) {
+                            popUpTo(0)  // Limpia el backstack
+                        }
+                    }
                 )
             }
 

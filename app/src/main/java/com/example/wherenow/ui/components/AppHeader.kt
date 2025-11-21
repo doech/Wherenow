@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -86,7 +87,7 @@ fun AppHeader(
                 onClick = onLogoutClick
             ) {
                 Icon(
-                    imageVector = Icons.Default.Logout,
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
                     contentDescription = "Cerrar sesión",
                     tint = Color.White
                 )

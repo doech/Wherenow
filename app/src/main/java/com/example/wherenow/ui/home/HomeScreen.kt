@@ -34,11 +34,32 @@ import com.example.wherenow.data.model.CircleRow
 import com.example.wherenow.ui.search.SearchViewModel
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import com.example.wherenow.data.model.JoinRequest
+import com.example.wherenow.ui.auth.AuthViewModel
+import com.example.wherenow.ui.components.JoinRequestDialog
+
 
 @Composable
 fun HomeScreen(navController: NavController, searchViewModel: SearchViewModel = viewModel()) {
 
     val circles by searchViewModel.circles.collectAsState()
+
+    var currentDialog by remember { mutableStateOf<JoinRequest?>(null) }
+    val authViewModel: AuthViewModel = viewModel()
+    val requests = authViewModel.requests.collectAsState().value
+
+    LaunchedEffect(requests) {
+        if (requests.isNotEmpty()) {
+            currentDialog = requests.first()
+        }
+    }
+
+    if (currentDialog != null) {
+        JoinRequestDialog(
+            request = currentDialog!!,
+            onDismiss = { currentDialog = null }
+        )
+    }
 
     LaunchedEffect(Unit) {
         searchViewModel.loadData()
@@ -61,7 +82,12 @@ fun HomeScreen(navController: NavController, searchViewModel: SearchViewModel = 
             AppHeader(
                 userName = "Usuario",
                 handle = "@Usuario123",
-                onProfileClick = { navController.navigate("Pega_aquí_tu_ruta_de_perfil") }
+                onProfileClick = { navController.navigate("Pega_aquí_tu_ruta_de_perfil") },
+                onLogoutClick = { authViewModel.logout()
+                    navController.navigate(NavRoutes.AUTH) {
+                        popUpTo(0)  // Limpia el backstack
+                    }
+                }
             )
         }
 

@@ -8,6 +8,8 @@ import com.example.wherenow.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.example.wherenow.data.model.JoinRequest
+import com.example.wherenow.data.repository.FirestoreEventRepository
 
 class AuthViewModel(
     private val authRepo: AuthRepository = AuthRepository(),
@@ -17,13 +19,44 @@ class AuthViewModel(
     private val _user = MutableStateFlow<UserProfile?>(null)
     val user = _user.asStateFlow()
 
+    private val _requests = MutableStateFlow<List<JoinRequest>>(emptyList())
+    val requests = _requests.asStateFlow()
+
+
     init { loadCurrentUser() }
+
+    fun loadRequests() {
+        val uid = authRepo.getUid() ?: return
+
+        viewModelScope.launch {
+            try {
+                val repo = FirestoreEventRepository()
+                val list = repo.getAllJoinRequestsForOwner(uid)
+                _requests.value = list
+            } catch (e: Exception) {
+                _requests.value = emptyList()
+            }
+        }
+    }
+
+    fun removeRequest(userId: String, eventId: String) {
+        val currentList = _requests.value
+
+        // filtramos todo lo que NO coincide
+        val updated = currentList.filter { request ->
+            !(request.userId == userId && request.eventId == eventId)
+        }
+
+        _requests.value = updated
+    }
+
 
     fun loadCurrentUser() {
         val uid = authRepo.getUid() ?: return
         viewModelScope.launch {
             userRepo.getUser(uid) {
                 _user.value = it
+                loadRequests()
             }
         }
     }

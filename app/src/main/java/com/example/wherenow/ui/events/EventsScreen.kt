@@ -37,11 +37,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.LayoutDirection
 
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.wherenow.ui.auth.AuthViewModel
+import com.example.wherenow.navigation.NavRoutes
 
 @Composable
 fun EventsScreen(navController: NavController) {
     val repo = remember { FirestoreEventRepository() }
+    val eventsViewModel: EventsViewModel = viewModel()
+
+    val authViewModel: AuthViewModel = viewModel()
+    val currentUserId = authViewModel.user.collectAsState().value?.id
 
     var events by remember { mutableStateOf<List<EventRow>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
@@ -106,7 +112,12 @@ fun EventsScreen(navController: NavController) {
                 AppHeader(
                     userName = "Usuario",
                     handle = "@Usuario123",
-                    onProfileClick = { navController.navigate("profile") }
+                    onProfileClick = { navController.navigate("profile") },
+                    onLogoutClick = { authViewModel.logout()
+                        navController.navigate(NavRoutes.AUTH) {
+                            popUpTo(0)  // Limpia el backstack
+                        }
+                    }
                 )
             }
 
@@ -238,7 +249,12 @@ fun EventCard(event: EventRow, onViewDetails: () -> Unit) {
 // =====================================================
 @Composable
 fun EventDetails(event: EventRow, onBack: () -> Unit) {
+
     val context = LocalContext.current
+
+    val authViewModel: AuthViewModel = viewModel()
+    val currentUserId = authViewModel.user.collectAsState().value?.id
+    val eventsViewModel: EventsViewModel = viewModel()
 
     // Se recuerda por evento (clave = event.eventId) para que al cambiar de evento se resetee.
     var requestSent by remember(event.eventId) { mutableStateOf(false) }
@@ -296,8 +312,15 @@ fun EventDetails(event: EventRow, onBack: () -> Unit) {
                         onClick = {
                             if (!requestSent) {
                                 requestSent = true
-                                Toast.makeText(context, "Request submitted", Toast.LENGTH_SHORT).show()
 
+                                eventsViewModel.requestJoinEvent(event.eventId, currentUserId ?: "")
+
+                                // Mostrar confirmación
+                                Toast.makeText(
+                                    context,
+                                    "Request submitted",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),

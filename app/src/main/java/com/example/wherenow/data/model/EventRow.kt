@@ -4,6 +4,7 @@ import java.util.Date
 
 data class EventRow(
     val eventId: String = "",
+    val ownerId: String = "",
     val name: String = "",
     val description: String = "",
     val location: String = "",

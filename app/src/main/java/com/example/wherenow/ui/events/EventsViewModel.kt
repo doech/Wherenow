@@ -35,5 +35,35 @@ class EventsViewModel(
         repo.addEvent(name = "Sample Event")
         loadEvents()
     }
+
+    fun requestJoinEvent(eventId: String, userId: String) = viewModelScope.launch {
+        _loading.value = true
+        _error.value = null
+
+        try {
+            repo.sendJoinRequest(eventId, userId)
+        } catch (e: Exception) {
+            _error.value = e.message
+        } finally {
+            _loading.value = false
+        }
+    }
+
+    fun acceptJoinRequest(eventId: String, userId: String) = viewModelScope.launch {
+        try {
+            repo.acceptJoinRequest(eventId, userId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun rejectJoinRequest(eventId: String, userId: String) = viewModelScope.launch {
+        try {
+            repo.rejectJoinRequest(eventId, userId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 }
 

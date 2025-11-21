@@ -12,4 +12,9 @@ interface EventRepository {
     ): String
 
     suspend fun setStatus(eventId: String, status: String)
+
+    suspend fun sendJoinRequest(eventId: String, userId: String)
+
+    suspend fun acceptJoinRequest(eventId: String, userId: String)
+    suspend fun rejectJoinRequest(eventId: String, userId: String)
 }
