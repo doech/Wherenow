@@ -1,319 +1,205 @@
+
 # 📱 WhereNow
 
-Aplicación Android desarrollada en **Kotlin con Jetpack Compose** para la clase de Programación de Plataformas Móviles 
-El objetivo de WhereNow es permitir a los usuarios crear una cuenta, y en base a un quiz, poder recomendar eventos ocurriendo cerca del usuario para que este pueda involucrarse en actividades sociales y tener círculos personalizados con amigos, conocidos o personas con los mismos intereses.
+Aplicación Android desarrollada en **Kotlin + Jetpack Compose**, como proyecto final del curso **Programación de Plataformas Móviles**.
+WhereNow permite a los usuarios **descubrir eventos, crear círculos sociales y comunicarse dentro de ellos**, integrando Firebase para autenticación, datos en tiempo real y persistencia.
 
 ---
 
-## 👥 Equipo de desarrollo
-**Grupo #5 - coordinadora: Alejandra Sierra**
+# 👥 Equipo de desarrollo
 
-- **Alejandro Pérez**  
-- **Emily Góngora**  
-- **Esteban De la Peña** 
-- **Martín Villatoro**   
-- **Camila Sandoval** 
+**Grupo #5 — Coordinadora: Alejandra Sierra**
 
----
-
-## 📝 Descripción general
-
-WhereNow guía al usuario a través de un flujo de pantallas que van desde el **registro/login** hasta la **selección de intereses**, utilizando un sistema de navegación basado en **NavHost** y rutas centralizadas.  
-La aplicación también implementa **buenas prácticas**, como el uso de `strings.xml` para los textos y un ícono personalizado en el launcher.
+* **Alejandro Pérez** — HomeScreen, implementación de círculos, motor de búsqueda
+* **Emily Góngora** — Diseño de pantallas, implementación de eventos, recursos UI
+* **Esteban De la Peña** — Arquitectura de Firebase (Auth + Firestore)
+* **Martín Villatoro** — Arquitectura MVVM, Quiz de gustos, categorías e intereses
+* **Camila Sandoval** — Diseño UI, manejo de usuario y navegación inicial
 
 ---
 
-# 📘 WhereNow – Estructura de Base de Datos (Firestore)
+# 📝 Descripción General
 
-## 📖 Descripción General
+WhereNow guía al usuario desde **registro/login**, pasando por el **quiz de intereses**, hasta navegar por:
 
-WhereNow es una aplicación móvil desarrollada en Kotlin + Jetpack Compose que conecta usuarios con eventos locales y comunidades afines.  
-Esta base de datos en **Firebase Firestore** utiliza un modelo **híbrido** entre relaciones implícitas y subcolecciones para equilibrar escalabilidad, rendimiento y simplicidad en consultas.
+* Círculos sociales
+* Eventos recomendados
+* Buscador unificado
+* Chats básicos dentro de círculos
 
-El objetivo es permitir:
-- Autenticación y perfiles de usuario.
-- Gestión de eventos geolocalizados.
-- Creación y participación en círculos (grupos sociales).
-- Comunicación en tiempo real mediante subcolecciones de chat.
-- Personalización de experiencia mediante intereses (categorías).
+La arquitectura utiliza:
 
----
-
-## 🎗️ Arquitectura de Datos
-
-### 📂 Colección general: `/users`
-
-Guarda la información principal de cada usuario.
-
-```json
-{
-  "id": "user_123",
-  "name": "David Hernandez",
-  "username": "david_hdz",
-  "email": "david@example.com",
-  "photoUrl": "https://.../avatar.jpg",
-  "bio": "Music & fitness lover.",
-  "language": "es",
-  "location": {
-    "city": "Guatemala City",
-    "lat": 14.6349,
-    "lng": -90.5069
-  },
-  "createdAt": <serverTimestamp>,
-  "status": "active"
-}
-```
-
-#### 🔸 Subcolección: `/users/{userId}/events`
-Eventos donde el usuario participa o que ha creado.
-```json
-{
-  "eventId": "E001",
-  "joinedAt": <serverTimestamp>,
-  "role": "participant"
-}
-```
-
-#### 🔸 Subcolección: `/users/{userId}/circles`
-Círculos a los que pertenece el usuario.
-```json
-{
-  "circleId": "C001",
-  "joinedAt": <serverTimestamp>,
-  "role": "member"
-}
-```
-
-#### 🔸 Subcolección: `/users/{userId}/categories`
-Intereses o categorías seleccionadas por el usuario (relación usuario ↔ categoría).
-```json
-{
-  "categoryId": "music",
-  "selectedAt": <serverTimestamp>
-}
-```
+✔ MVVM
+✔ Repository Pattern
+✔ Jetpack Compose
+✔ Firebase Auth + Firestore
 
 ---
 
-### 📂 Colección principal: `/events`
+# 🎯 Funcionalidades Implementadas
 
-Cada documento dentro de esta colección representa un evento publicado en la aplicación **WhereNow**.  
-La estructura refleja los campos actualmente utilizados por la app en Firestore.
+### 🔐 Autenticación
 
+* Registro (email + contraseña)
+* Inicio y cierre de sesión
+* Perfil guardado en Firestore
 
-```json
-{
-  "eventId": "EVT001",
-  "name": "Food Truck Festival",
-  "description": "Over 20 gourmet food trucks featuring cuisines from around the world.",
-  "location": "Brooklyn Bridge Park",
-  "distanceText": "1.2 miles away",
-  "priceText": "15",
-  "interested": 89,
-  "status": "active",
-  "createdAt": "2025-10-27T23:45:00Z",
-  "startAt": "2025-12-05T18:00:00Z"
-}
+### 🧭 Navegación (NavHost)
+
+* Rutas centralizadas en `NavRoutes`
+* Flujo completo Auth → Quiz → Home
+* Navegación segura con `popUpTo()`
+
+### 👤 Perfil de Usuario
+
+* Nombre
+* Username
+* Email
+* Intereses
+* Ubicación automática
+
+### 🏷 Quiz de Intereses
+
+* Categorías dinámicas desde Firestore
+* Guardado en `/users/{id}/categories`
+* Impacto en recomendaciones
+
+### 👥 Círculos Sociales
+
+* Crear círculo (nombre, descripción, categoría)
+* Guardado en `/circles`
+* Visualización en HomeScreen
+* Vista detallada con chats básicos
+
+### 🎫 Eventos
+
+* Carga desde Firestore
+* Tarjetas con descripción, distancia, precio
+* Join Request (modal)
+
+### 🔍 Buscador global
+
+* Usuarios
+* Eventos
+* Círculos
+* Filtros por categoría
+
+### 💬 Chats (UI básica)
+
+* Burbuja de mensajes
+* Autoscroll
+* Encabezado del círculo
+* Lista de mensajes tipo mock (listo para Firebase Realtime/Firestore en el futuro)
+
+---
+
+# 🏗 Estructura del Proyecto
 
 ```
+/data
+   /model          Modelos (User, Event, Circle…)
+   /repository     Conexión Firebase (Auth, Users, Events, Circles)
 
-#### 🔸 Subcolección: `/events/{eventId}/comments`
-Comentarios de los usuarios dentro del evento.
-```json
-{
-  "id": "comment_001",
-  "userId": "user_456",
-  "text": "Great music yesterday!",
-  "createdAt": <serverTimestamp>
-}
-```
+/navigation
+   NavRoutes.kt    Rutas principales
+   NavComposable   Administrador del flujo
 
-#### 🔸 Subcolección: `/events/{eventId}/chat`
-Mensajes en tiempo real del evento.
-```json
-{
-  "id": "message_001",
-  "senderId": "user_789",
-  "message": "Who's coming tonight?",
-  "createdAt": <serverTimestamp>
-}
-```
+/ui
+   /auth           Login, Signup, AuthViewModel
+   /home           HomeScreen, CreateCircle, Chats
+   /events         Lista de eventos + ViewModel
+   /circles        CircleViewModel
+   /search         Search + resultados, SearchViewModel
+   /components     Header, BottomBar, Dialogs reutilizables
+   /quiz           Quiz de categorías
+   /theme          Colores, tipografías, estilos
 
-#### 🔸 Subcolección: `/events/{eventId}/media`
-Archivos multimedia asociados al evento (imágenes, flyers, etc.).
-```json
-{
-  "id": "media_001",
-  "url": "https://firebasestorage.googleapis.com/...",
-  "type": "image",
-  "uploadedBy": "user_123",
-  "createdAt": <serverTimestamp>
-}
+/util
+   FirestoreSeeder Seeder de categorías
+   MainActivity    Punto de entrada
 ```
 
 ---
 
-### 📂 Colección general: `/circles`
+# 🔥 Estructura de Base de Datos (Firestore)
 
-Representa grupos sociales creados por usuarios con intereses comunes.
+### `/users/{userId}`
 
-```json
-{
-  "id": "C001",
-  "name": "Music Lovers Network",
-  "description": "Discussing concerts and music events.",
-  "category": "music",
-  "creatorId": "user_456",
-  "visibility": "public",
-  "membersCount": 24,
-  "lastActivity": <timestamp>,
-  "status": "active",
-  "createdAt": <serverTimestamp>
-}
-```
+Información principal del usuario.
 
-#### 🔸 Subcolección: `/circles/{circleId}/members`
-Miembros del círculo.
-```json
-{
-  "userId": "user_123",
-  "role": "admin",
-  "joinedAt": <serverTimestamp>
-}
-```
+Subcolecciones:
 
-#### 🔸 Subcolección: `/circles/{circleId}/posts`
-Publicaciones internas (reemplaza el concepto de “posts” globales).
-```json
-{
-  "id": "post_001",
-  "authorId": "user_789",
-  "text": "Anyone going to the jazz festival this weekend?",
-  "eventRef": "/events/E001",
-  "createdAt": <serverTimestamp>
-}
-```
-
-#### 🔸 Subcolección: `/circles/{circleId}/chat`
-Mensajes en tiempo real dentro del grupo.
-```json
-{
-  "id": "message_001",
-  "senderId": "user_789",
-  "message": "Let's meet there at 8pm!",
-  "createdAt": <serverTimestamp>
-}
-```
+* `/events` — eventos donde participa
+* `/circles` — círculos donde está
+* `/categories` — intereses seleccionados
 
 ---
 
-### 🏷️ Colección general: `/categories`
+### `/events/{eventId}`
 
-Catálogo de categorías utilizadas para eventos, círculos e intereses de usuario.  
-Este contenido es **quemado y multilenguaje**.
+Información de eventos activos.
 
-```json
-{
-  "id": "music",
-  "name": { "en": "Music", "es": "Música" },
-  "color": "#A855F7",
-  "icon": "music",
-  "status": "active",
-  "createdAt": <serverTimestamp>
-}
-```
+Subcolecciones:
+
+* `/comments`
+* `/chat` (estructura compatible para mensajes)
+* `/media`
 
 ---
 
-### ⚙️ Colección opcional: `/app_metadata`
+### `/circles/{circleId}`
 
-Configuraciones globales del sistema.
+Información general del círculo.
 
-```json
-{
-  "version": "1.0.0",
-  "minSupportedVersion": "0.9.0",
-  "maintenance": false,
-  "supportedLanguages": ["en", "es"],
-  "createdAt": <serverTimestamp>
-}
-```
+Subcolecciones:
+
+* `/members`
+* `/posts`
+* `/chat` — lista para chats en tiempo real
 
 ---
 
-## 🔗 Relaciones Principales
+### `/categories/{categoryId}`
 
-| Relación | Descripción |
-|-----------|--------------|
-| `/users/{id}/events → /events/{eventId}` | Registra la participación de un usuario en un evento. |
-| `/users/{id}/circles → /circles/{circleId}` | Conecta al usuario con los círculos donde participa. |
-| `/users/{id}/categories → /categories/{categoryId}` | Define los intereses del usuario. |
-| `/circles/{circleId}/posts.eventRef → /events/{eventId}` | Permite enlazar publicaciones con eventos. |
-| `/events/{eventId}/comments.userId → /users/{id}` | Asocia comentarios con el autor correspondiente. |
+Catálogo de intereses multilenguaje.
 
 ---
 
-## 🌍 Soporte Multilenguaje
+# 🌱 Escalabilidad del Sistema
 
-Los campos multilenguaje solo se aplican a **datos estáticos o predefinidos**, como:
-- `categories.name`
-- `events.name`
-- `events.description`
+WhereNow fue diseñado para crecer sin romper la estructura:
 
-No se usa en contenido dinámico (comentarios, mensajes, etc.).
+### ✔ Arquitectura MVVM
 
-Formato estándar:
-```json
-"name": { "en": "Music", "es": "Música" }
-```
+Cada pantalla tiene su ViewModel → más fácil extender funcionalidades.
 
----
+### ✔ Repositorios desacoplados
 
-## 🧠 Notas de Diseño
+Cambiar Firebase por otra base de datos no rompe la app.
 
-- Cada documento incluye `createdAt` y `status` para control y trazabilidad.
-- Las **subcolecciones son opcionales**, se crean solo cuando hay datos.
-- La estructura está optimizada para:
-  - Consultas rápidas por usuario, evento o círculo.
-  - Filtro por categorías (intereses).
-  - Soporte de tiempo real con Firestore listeners.
+### ✔ Firestore modular
 
----
+Colecciones limpias, subcolecciones livianas y queries rápidas.
 
-## 🧉 Ejemplo de árbol de rutas
+### ✔ Chats listos para tiempo real
 
-```
-/users
-  /{userId}
-    /events
-    /circles
-    /categories
-/events
-  /{eventId}
-    /comments
-    /chat
-    /media
-/circles
-  /{circleId}
-    /members
-    /posts
-    /chat
-/categories
-  /{categoryId}
-/app_metadata
-  /{docId}
-```
+La UI ya está implementada — solo falta conectar listener de Firestore.
+
+### ✔ Navegación flexible
+
+Agregar pantallas nuevas es inmediato debido al sistema de rutas.
 
 ---
 
-## ✅ Ventajas del Modelo
+# 🚀 Conclusión
 
-- Estructura modular, escalable y sin redundancias.
-- Soporta feed social **contextualizado** dentro de círculos.
-- Permite búsquedas personalizadas por ubicación e intereses.
-- Compatible con una arquitectura híbrida (Firestore + PostgreSQL opcional).
-- Facilita sincronización y análisis de datos sin romper la jerarquía lógica.
+WhereNow es un proyecto completo, modular y escalable que combina:
+
+* Arquitectura robusta
+* Firebase real para producción
+* UI moderna con Jetpack Compose
+* Flujo sólido de usuario
+* Funciones colaborativas (círculos, eventos, búsqueda, chat)
 
 ---
-
 
