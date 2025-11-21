@@ -35,6 +35,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.unit.LayoutDirection
+
 
 
 @Composable
@@ -79,7 +81,7 @@ fun EventsScreen(navController: NavController) {
     }
 
 
-    val headerHeight = 172.dp
+    val headerHeight = 112.dp
 
     Scaffold(
         containerColor = Color(0xFFF7F6FB),
@@ -88,7 +90,11 @@ fun EventsScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(
+                    start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                    end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                    bottom = paddingValues.calculateBottomPadding()
+                )
                 .background(Color(0xFFF7F6FB))
         ) {
             // HEADER

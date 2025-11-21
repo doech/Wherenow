@@ -48,7 +48,7 @@ fun AppHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(172.dp)
+            .height(112.dp)
             .background(
                 brush = gradient,
                 shape = RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp)

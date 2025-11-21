@@ -1,5 +1,6 @@
 package com.example.wherenow.ui.search
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,6 +24,19 @@ import com.example.wherenow.ui.components.BottomNavigationBar
 import com.example.wherenow.ui.components.AppHeader
 import com.example.wherenow.navigation.NavRoutes
 import com.example.wherenow.data.model.SearchResult
+import com.example.wherenow.ui.events.EventDetails
+import androidx.compose.ui.unit.LayoutDirection
+
+
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import com.example.wherenow.ui.events.EventDetails
+import com.example.wherenow.data.model.EventRow
+import com.example.wherenow.data.model.UserProfile
+import coil.compose.AsyncImage
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun SearchScreen(
@@ -34,6 +49,9 @@ fun SearchScreen(
     val users by viewModel.users.collectAsState()
     val events by viewModel.events.collectAsState()
     val circles by viewModel.circles.collectAsState()
+
+    var selectedEvent by remember { mutableStateOf<EventRow?>(null) }
+    var selectedUser by remember { mutableStateOf<UserProfile?>(null) }
 
     // estado local (ANTES estaba en el ViewModel)
     var query by remember { mutableStateOf("") }
@@ -73,7 +91,7 @@ fun SearchScreen(
         filtered.filter { it.name.contains(query, ignoreCase = true) }
     }
 
-    val headerHeight = 172.dp
+    val headerHeight = 112.dp
 
     Scaffold(
         containerColor = Color(0xFFF7F6FB),
@@ -82,7 +100,11 @@ fun SearchScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(
+                    start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                    end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                    bottom = paddingValues.calculateBottomPadding()
+                )
         ) {
             // header
             Box(
@@ -100,7 +122,7 @@ fun SearchScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = headerHeight + 16.dp, start = 16.dp, end = 16.dp)
+                    .padding(top = headerHeight + 10.dp, start = 16.dp, end = 16.dp)
             ) {
                 SearchCard(
                     query = query,
@@ -122,16 +144,44 @@ fun SearchScreen(
 
                     searchResults.isEmpty() -> NoResultsState()
 
-                    else -> SearchResultsList(
-                        results = searchResults,
-                        onResultClick = { result ->
-                            when (result.type) {
-                                "event" -> navController.navigate(NavRoutes.EVENTS)
-                                "circle" -> navController.navigate(NavRoutes.HOME)
-                                "user" -> navController.navigate(NavRoutes.HOME)
+                    else -> if (selectedEvent != null) {
+                        EventDetails(
+                            event = selectedEvent!!,
+                            onBack = { selectedEvent = null }
+                        )
+                    }else if (selectedUser != null) {
+                        UserDetails(
+                        user = selectedUser!!,
+                        onBack = { selectedUser = null }
+                        )
+                    } else {
+                        SearchResultsList(
+                            results = searchResults,
+                            onResultClick = { result ->
+                                when (result.type) {
+                                    "event" -> {
+                                        val event = events.find { it.eventId == result.id }
+                                        if (event != null) {
+                                            selectedEvent = event
+                                        }
+                                    }
+                                    "circle" -> {
+                                        val circle = circles.find { it.id == result.id }
+                                        val encodedName = Uri.encode(circle?.name ?: "")
+                                        val members = circle?.membersCount ?: 0
+                                        val colorArgb = Color(0xFF9C27B0).toArgb()
+                                        navController.navigate("${NavRoutes.CHAT}/$encodedName/$members/$colorArgb")
+                                    }
+                                    "user" -> {
+                                        val user = users.find { it.id == result.id }
+                                        if (user != null) {
+                                            selectedUser = user
+                                        }
+                                    }
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -246,4 +296,125 @@ fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
             }
         }
     }
+}
+@Composable
+fun UserDetails(
+    user: UserProfile,
+    onBack: () -> Unit
+) {
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F4F8)),
+        contentPadding = PaddingValues(bottom = 40.dp)
+    ) {
+        item {
+
+            // BOTÓN BACK
+            TextButton(
+                onClick = onBack,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+            ) {
+                Icon(
+                    Icons.Filled.ArrowBackIosNew,
+                    contentDescription = "Back"
+                )
+                Spacer(Modifier.width(6.dp))
+                Text("Back")
+            }
+
+            // FOTO
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    model = if (user.photoUrl.isNotBlank()) user.photoUrl
+                    else "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFE0E0E0)),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = "User photo"
+                )
+            }
+
+            // CARD
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+
+                    // NAME
+                    Text(
+                        text = user.name.ifBlank { "Unknown User" },
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 24.sp,
+                        color = Color(0xFF222222)
+                    )
+
+                    // USERNAME
+                    Text(
+                        text = "@${user.username}",
+                        fontSize = 15.sp,
+                        color = Color(0xFF7E57C2)
+                    )
+
+                    Spacer(Modifier.height(14.dp))
+
+                    // BIO
+                    if (user.bio.isNotBlank()) {
+                        SectionLabel("Bio")
+                        Text(
+                            text = user.bio,
+                            fontSize = 14.sp,
+                            color = Color(0xFF5E5E5E)
+                        )
+                        Spacer(Modifier.height(12.dp))
+                    }
+
+                    // EMAIL
+                    if (user.email.isNotBlank()) {
+                        SectionLabel("Email")
+                        Text(user.email, fontSize = 14.sp, color = Color(0xFF333333))
+                        Spacer(Modifier.height(12.dp))
+                    }
+
+                    // CITY
+                    if (user.city.isNotBlank()) {
+                        SectionLabel("City")
+                        Text(user.city, fontSize = 14.sp, color = Color(0xFF333333))
+                        Spacer(Modifier.height(12.dp))
+                    }
+
+                    // LANGUAGE
+                    SectionLabel("Language")
+                    Text(user.language.uppercase(), fontSize = 14.sp, color = Color(0xFF333333))
+                    Spacer(Modifier.height(12.dp))
+
+                    // STATUS
+                    SectionLabel("Status")
+                    Text(user.status, fontSize = 14.sp, color = Color(0xFF333333))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text,
+        fontSize = 12.sp,
+        color = Color(0xFF9A9A9A),
+        fontWeight = FontWeight.Medium
+    )
 }

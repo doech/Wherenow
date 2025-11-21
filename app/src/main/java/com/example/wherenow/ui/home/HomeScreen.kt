@@ -49,7 +49,7 @@ fun HomeScreen(navController: NavController, searchViewModel: SearchViewModel = 
 
     //LaunchedEffect(Unit) { showEventAcceptedPopup = true }
 
-    val headerHeight = 172.dp
+    val headerHeight = 112.dp
 
     Box(modifier = Modifier.fillMaxSize()) {
 
